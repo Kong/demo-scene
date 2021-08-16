@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: httpbin-free-tier
+  annotations:
+    konghq.com/strip-path: "true"
+    #konghq.com/plugins: httpbin-free-tier
+spec:
+  ingressClassName: kong
+  rules:
+    - http:
+        paths:
+          - path: /free
+            pathType: Prefix
+            backend:
+              service:
+                name: httpbin
+                port:
+                  number: 80                  
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: httpbin-free-tier
+config:
+  minute: 5
+  limit_by: ip
+  policy: local
+plugin: rate-limiting

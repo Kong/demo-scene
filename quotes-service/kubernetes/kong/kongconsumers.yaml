@@ -1,0 +1,72 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: "2021-08-06T03:16:54Z"
+  generation: 1
+  name: kongconsumers.configuration.konghq.com
+  resourceVersion: "13667061"
+  uid: 1f9a95d4-5662-4a70-9662-6618bda978ae
+spec:
+  conversion:
+    strategy: None
+  group: configuration.konghq.com
+  names:
+    kind: KongConsumer
+    listKind: KongConsumerList
+    plural: kongconsumers
+    shortNames:
+    - kc
+    singular: kongconsumer
+  preserveUnknownFields: true
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Username of a Kong Consumer
+      jsonPath: .username
+      name: Username
+      type: string
+    - description: Age
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          credentials:
+            items:
+              type: string
+            type: array
+          custom_id:
+            type: string
+          username:
+            type: string
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: KongConsumer
+    listKind: KongConsumerList
+    plural: kongconsumers
+    shortNames:
+    - kc
+    singular: kongconsumer
+  conditions:
+  - lastTransitionTime: "2021-08-06T03:16:54Z"
+    message: '[spec.preserveUnknownFields: Invalid value: true: must be false, spec.versions[0].schema.openAPIV3Schema.type:
+      Required value: must not be empty at the root]'
+    reason: Violations
+    status: "True"
+    type: NonStructuralSchema
+  - lastTransitionTime: "2021-08-06T03:16:54Z"
+    message: no conflicts found
+    reason: NoConflicts
+    status: "True"
+    type: NamesAccepted
+  - lastTransitionTime: "2021-08-06T03:16:54Z"
+    message: the initial names have been accepted
+    reason: InitialNamesAccepted
+    status: "True"
+    type: Established
+  storedVersions:
+  - v1

@@ -1,0 +1,26 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dune-quote-service
+  annotations:
+    konghq.com/protocols: grpc,grpcs
+    kubernetes.io/ingress.class: kong
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - secretName: kong.gamov.dev
+      hosts:
+        - kong.gamov.dev
+  rules:
+    - host: kong.gamov.dev
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dune-quote-service
+                port:
+                  number: 9001

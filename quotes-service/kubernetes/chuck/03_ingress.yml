@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chuck-quote-services
+  annotations:
+    konghq.com/strip-path: "true"
+    kubernetes.io/ingress.class: kong
+    # konghq.com/plugins: user1-auth,rate-paid-tier,platinum-paid-tier
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /chuck
+            pathType: Prefix
+            backend:
+              service:
+                name: chuck-quote-service
+                port:
+                  number: 8080

@@ -1,0 +1,28 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: chuck-auth
+plugin: key-auth
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: chuck
+  annotations:
+    # needed to bind this consumer to service
+    kubernetes.io/ingress.class: kong
+    konghq.com/plugins: platinum-paid-tier
+username: chuck
+credentials:
+  - chuck-apikey    
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: platinum-paid-tier
+config:
+  minute: 100
+  limit_by: consumer
+  policy: local
+plugin: rate-limiting
+

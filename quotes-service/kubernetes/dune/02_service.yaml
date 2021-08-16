@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/protocol: grpcs
+  name: dune-quote-service
+  labels:
+    app: dune-quote-service
+spec:
+  ports:
+    - name: grpc
+      port: 9001
+      targetPort: 9001
+  selector:
+    app: dune-quote-service

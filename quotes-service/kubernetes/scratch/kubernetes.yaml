@@ -1,0 +1,79 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: api-auth
+plugin: key-auth  # name of plugin in Kong
+config: # plugin specific settings
+  key_names: apikey
+  hide_credentials: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finance-apis
+spec:
+  rules:
+    - host: example.com
+      http:
+        paths:
+          - path: /bills
+            backend:
+              service:
+                name: bills
+                port:
+                  number: 80
+          - path: /orders
+            backend:
+              service:
+                name: orders
+                port:
+                  number: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finance-apis
+  annotations:
+    konghq.com/plugins: api-auth  #or add multiple plugins
+spec:
+  rules:
+    - host: example.com
+      http:
+        paths:
+          - path: /bills
+            backend:
+              service:
+                name: bills
+                port:
+                  number: 80
+          - path: /orders
+            backend:
+              service:
+                name: orders
+                port:
+                  number: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finance-apis
+  annotations:
+    konghq.com/plugins: api-auth, admins-acl-group, rate-limit-5rpm
+spec:
+  rules:
+    - host: example.com
+      http:
+        paths:
+          - path: /bills
+            backend:
+              service:
+                name: bills
+                port:
+                  number: 80
+          - path: /orders
+            backend:
+              service:
+                name: orders
+                port:
+                  number: 443
+

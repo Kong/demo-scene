@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dune-quote-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dune-quote-service
+  template:
+    metadata:
+      labels:
+        app: dune-quote-service
+    spec:
+      containers:
+        - image: gamussa/reactive-quote-service:0.0.3
+          imagePullPolicy: Always
+          name: dune-quote-service
+          ports:
+            - containerPort: 9001
+          env:
+            - name: GRPC_SERVER_PORT
+              value: "9001"
+            - name: GRPC_SERVER_SECURITY_ENABLED
+              value: "true"
+            - name: GRPC_SERVER_SECURITY_CERTIFICATECHAIN
+              value: "file:/mnt/grpc-cert-chain/server.crt"
+            - name: GRPC_SERVER_SECURITY_PRIVATEKEY
+              value: "file:/mnt/grpc-pk/server.key"
+          volumeMounts:
+            - mountPath: /mnt/grpc-cert-chain
+              name: grpc-cert-chain
+            - mountPath: /mnt/grpc-pk
+              name: grpc-pk
+      volumes:
+        - name: grpc-cert-chain
+          secret:
+            secretName: grpc-cert-chain
+        - name: grpc-pk
+          secret:
+            secretName: grpc-pk
