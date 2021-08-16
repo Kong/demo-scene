@@ -3,7 +3,7 @@
 version: 2
 updates:
   - package-ecosystem: "gradle"
-    directory: "/" 
+    directory: "/quotes-service" 
     schedule:
       interval: "weekly"
     # Add reviewers

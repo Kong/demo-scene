@@ -201,3 +201,4 @@ $RECYCLE.BIN/
 *.lnk
 
 /kic-prometheus-grafana/.idea/
+.idea
