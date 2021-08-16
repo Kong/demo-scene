@@ -21,9 +21,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: go to "/quotes-service"
-      run: cd ./quotes-service
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      run: cd ./quotes-service && chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build
+      run: cd ./quotes-service && ./gradlew build
