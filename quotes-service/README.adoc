@@ -1,0 +1,57 @@
+= Using Kong Ingress Controller (KIC) for Kubernetes
+Viktor Gamov
+v0.1, 2021-06-06
+:toc:
+:homepage: http://konghq.com
+
+This is WIP demo based on https://konghq.com/blog/kubernetes-ingress-api-gateway[blogpost].
+It generates random quotes (courtesy of http://dius.github.io/java-faker/[Java Faker library]) as rest call response.
+
+[source,bash]
+.the commands for demo
+----
+gcloud container clusters create my-kong-kic --num-nodes 3 --machine-type n1-standard-1 --zone us-east1-c   #<1>
+
+./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:0.0.3-SNAPSHOT    #<2>
+
+docker push gamussa/reactive-quote-service:0.0.3-SNAPSHOT   #<3>
+
+docker run -d -p 8080:8080 gamussa/reactive-quote-service:0.0.3-SNAPSHOT    #<4>
+docker run -d -p 6565:6565 -e GRPC_ENABLED=true gamussa/reactive-quote-service:0.0.3-SNAPSHOT    #<5>
+
+kubectl create -f https://bit.ly/k4k8s      #<6>
+
+kubectl apply -f ./kubernetes       #<7>
+----
+<1> Create Kubernetes cluster in GCP.
+<2> Build an image.
+<3> Push an image to Docker Hub.
+<4> Run microservice app locally. 
+<5> Run gRPC service locally.
+<6> Install KIC.
+<7> Deploy apps, services, ingress.
+
+== running grpc service
+
+[source,bash]
+.grpcSecrets.sh
+----
+openssl req -x509 -nodes -subj "/CN=gamov.dev" -newkey rsa:4096 -sha256 -keyout server.key -out server.crt -days 3650
+
+kubectl create secret generic grpc-cert-chain --from-file=server.crt=server.crt
+kubectl create secret generic grpc-pk --from-file=server.key=server.key
+----
+
+[source]
+.scratch
+----
+ k create secret generic quotes-apikey --from-literal=kongCredType=key-auth --from-literal=key=secret-key #<1>
+
+export PROXY_IP=`kgs --namespace kong kong-proxy -ojson | jq -r '.status.loadBalancer.ingress[0].ip'`   #<2>
+----
+<1> create API key
+<2> get external IP
+
+
+
+

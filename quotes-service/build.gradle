@@ -1,0 +1,89 @@
+plugins {
+  id 'org.springframework.boot' version '2.5.3'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'java'
+  id 'idea'
+  //id 'org.springframework.experimental.aot' version '0.10.0-SNAPSHOT'
+  id 'net.researchgate.release' version '2.8.1'
+  id "com.google.protobuf" version "0.8.17"
+}
+
+group = 'io.kong.developer'
+sourceCompatibility = '11'
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+repositories {
+  maven { url 'https://repo.spring.io/snapshot' }
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-webflux'
+  implementation "com.github.javafaker:javafaker:1.0.2"
+  implementation "io.dekorate:kubernetes-spring-starter:2.3.3"
+  annotationProcessor "io.dekorate:kubernetes-annotations:2.2.2"
+
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+
+  //grpc stuff
+  implementation 'net.devh:grpc-server-spring-boot-starter:2.12.0.RELEASE'
+  implementation "com.google.protobuf:protobuf-java:3.17.3"
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'io.projectreactor:reactor-test'
+}
+
+test {
+  useJUnitPlatform()
+}
+
+/*
+bootBuildImage {
+  builder = 'paketobuildpacks/builder:tiny'
+  environment = ['BP_NATIVE_IMAGE': 'true']
+}
+*/
+
+release {
+  git {
+    requireBranch = 'main'
+  }
+}
+
+protobuf {
+
+  //generatedFilesBaseDir = "$buildDir/generated-main-proto-java"
+
+  // Configure the protoc executable
+  protoc {
+    // Download from repositories
+    artifact = 'com.google.protobuf:protoc:3.17.3'
+  }
+  plugins {
+    grpc {
+      artifact = 'io.grpc:protoc-gen-grpc-java:1.39.0'
+    }
+  }
+  generateProtoTasks {
+    all()*.plugins { grpc {} }
+  }
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs 'build/generated/source/proto/main/grpc'
+      srcDirs 'build/generated/source/proto/main/java'
+    }
+  }
+}
+
+springBoot {
+  buildInfo()
+}

@@ -1,0 +1,36 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: httpbin-auth
+plugin: key-auth
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: quotes-apikey
+type: Opaque
+data:
+  key: c2VjcmV0LWtleQ==
+  kongCredType: a2V5LWF1dGg=
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: quotes
+  annotations:
+    # needed to bind this consumer to service
+    kubernetes.io/ingress.class: kong
+username: quotes
+credentials:
+  - quotes-apikey
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: httpbin-paid-tier
+config:
+  minute: 10
+  limit_by: ip
+  policy: local
+plugin: rate-limiting
+

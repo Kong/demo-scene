@@ -1,0 +1,99 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: "2021-08-06T03:16:54Z"
+  generation: 1
+  name: kongplugins.configuration.konghq.com
+  resourceVersion: "13667062"
+  uid: f34520c6-8fd1-49ac-ba60-bcd912bfd36c
+spec:
+  conversion:
+    strategy: None
+  group: configuration.konghq.com
+  names:
+    kind: KongPlugin
+    listKind: KongPluginList
+    plural: kongplugins
+    shortNames:
+    - kp
+    singular: kongplugin
+  preserveUnknownFields: true
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Name of the plugin
+      jsonPath: .plugin
+      name: Plugin-Type
+      type: string
+    - description: Age
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - description: Indicates if the plugin is disabled
+      jsonPath: .disabled
+      name: Disabled
+      priority: 1
+      type: boolean
+    - description: Configuration of the plugin
+      jsonPath: .config
+      name: Config
+      priority: 1
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          config:
+            type: object
+          disabled:
+            type: boolean
+          plugin:
+            type: string
+          protocols:
+            items:
+              enum:
+              - http
+              - https
+              - tcp
+              - tls
+              - grpc
+              - grpcs
+              type: string
+            type: array
+          run_on:
+            enum:
+            - first
+            - second
+            - all
+            type: string
+        required:
+        - plugin
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: KongPlugin
+    listKind: KongPluginList
+    plural: kongplugins
+    shortNames:
+    - kp
+    singular: kongplugin
+  conditions:
+  - lastTransitionTime: "2021-08-06T03:16:54Z"
+    message: '[spec.preserveUnknownFields: Invalid value: true: must be false, spec.versions[0].schema.openAPIV3Schema.type:
+      Required value: must not be empty at the root]'
+    reason: Violations
+    status: "True"
+    type: NonStructuralSchema
+  - lastTransitionTime: "2021-08-06T03:16:54Z"
+    message: no conflicts found
+    reason: NoConflicts
+    status: "True"
+    type: NamesAccepted
+  - lastTransitionTime: "2021-08-06T03:16:54Z"
+    message: the initial names have been accepted
+    reason: InitialNamesAccepted
+    status: "True"
+    type: Established
+  storedVersions:
+  - v1
