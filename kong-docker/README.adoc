@@ -1,0 +1,15 @@
+= kong in docker
+
+// draft script for docker tutorial video
+
+James Gosling promised us Write once run everywhere when he announced Java.
+But only docker and containers with Package once run everywhere were able to fulfill this promise.
+Hi, I'm Viktor gamov developer advocate at kong.
+and today I have, well, kong in a container.
+
+in this video i will explain how to run Kong locally using docker.
+
+— intro
+
+docker container are seems to be perfect chosice for distriburing complex software. and docker compose allows to configure collections of containes so we can run and test apps locally.
+in this tutorial I will show you how you can use Kong in db-less mode with declarative configuration and Kong with database (i will use Kong with Postgres however Cassandra also supported).
