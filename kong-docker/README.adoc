@@ -1,15 +1,54 @@
-= kong in docker
+= Kong in docker
 
 // draft script for docker tutorial video
 
-James Gosling promised us Write once run everywhere when he announced Java.
-But only docker and containers with Package once run everywhere were able to fulfill this promise.
-Hi, I'm Viktor gamov developer advocate at kong.
-and today I have, well, kong in a container.
+== prologue
 
-in this video i will explain how to run Kong locally using docker.
+James Gosling promised us when he was announcing Java - «Write Once, Run everywhere.»
+But in my humble opinion, only Docker and containers with «Package Once Run Everywhere» did fulfill this promise.
 
-— intro
+Hi, I'm Viktor gamov, a developer advocate at Kong.
+And today, I have, well, Kong in a container.
 
-docker container are seems to be perfect chosice for distriburing complex software. and docker compose allows to configure collections of containes so we can run and test apps locally.
-in this tutorial I will show you how you can use Kong in db-less mode with declarative configuration and Kong with database (i will use Kong with Postgres however Cassandra also supported).
+And in this video, I will explain how to run Kong API Gateway locally using Docker.
+
+== after intro
+
+docker container seems to be the perfect choice for distributing complex software. 
+And Docker Compose allows configuring collections of containers so we can run and test very complex setups locally.
+
+In this tutorial, you will learn: 
+
+- how you can use Kong in DB-less mode with declarative configuration and
+- how to use Kong with database (i will use Kong with Postgres; however, Cassandra also supported).
+
+I will use a simplified configuration in my demo to quickly explain the basics and concepts.
+Though, you can always find a production-ready and officially supported docker-compose file in the description below.
+
+
+== ending 
+
+And that would be it for today.
+To recap, in this video, you learned how to run Kong in DB-less mode in Docker and use declarative config to set up services, routes, and plugins
+as well as Kong with persistence using Postgres.
+
+If you found this helpful video, do me a favor - hit that like button and subscribe to this channel. 
+New tutorials are already in the works.
+
+As for now, my name is Viktor Gamov, and as always, have a nice day.
+
+== how to run
+
+[source,bash]
+.run dbless
+----
+cd dbless && docker-compose up -d   #<1>
+# uncomment config in `config/kong.yaml`
+http :8001/config config=@config/kong.yaml    #<2>
+http :8000/   #<3>
+----
+<1> Start kong container in dbless mode.
+<2> Update declarative config.
+<3> Test quote service.
+
+

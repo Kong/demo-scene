@@ -1,0 +1,5 @@
+{
+  "name": "quote-service-routes",
+  "paths": ["/"],
+  "strip_path": true
+}
