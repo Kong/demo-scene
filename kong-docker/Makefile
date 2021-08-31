@@ -12,7 +12,8 @@ check-dependency = $(if $(shell command -v $(1)),$(call echo_pass,found $(1)),$(
 kong-postgres: check-dependencies
 	docker-compose --file ./postgres/docker-compose.yaml up -d
 
-kong-dbless: check-dependencies	
+kong-dbless: check-dependencies
+	@$(call echo_stdout_header, 🦍 starting Kong print DB-less mode)
 	docker-compose --file ./dbless/docker-compose.yaml up -d
  	
 clean:
@@ -24,6 +25,9 @@ check-dependencies:
 	@$(call check-dependency,docker)
 	@$(call check-dependency,docker compose)
 	@$(call check-dependency,http)
+	@$(call check-dependency,timeout)
 
 check-dbless: kong-dbless
+	@$(call echo_stdout_header, 💨 running smoke test)
+	sleep 5s
 	http :8001/services
