@@ -24,3 +24,6 @@ check-dependencies:
 	@$(call check-dependency,docker)
 	@$(call check-dependency,docker compose)
 	@$(call check-dependency,http)
+
+check-dbless: kong-dbless
+	http :8001/services
