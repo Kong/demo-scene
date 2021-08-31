@@ -11,3 +11,13 @@ updates:
       - "gamussa"
     # Allow up to 10 open pull requests for gradle dependencies
     open-pull-requests-limit: 10
+  - package-ecosystem: "gradle"
+    directory: "/kafka-spring" 
+    schedule:
+      interval: "weekly"
+    # Add reviewers
+    reviewers:
+      - "gamussa"
+    # Allow up to 10 open pull requests for gradle dependencies
+    open-pull-requests-limit: 10
+
