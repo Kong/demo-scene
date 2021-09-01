@@ -21,7 +21,12 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: Grant execute permission for gradlew
+    - name: <quotes-service> Grant execute permission for gradlew
       run: cd ./quotes-service && chmod +x gradlew
-    - name: Build with Gradle
+    - name: <quotes-service> Build with Gradle
       run: cd ./quotes-service && ./gradlew build
+    - name: <kafka-spring> Grant execute permission for gradlew
+      run: cd ./kafka-spring && chmod +x gradlew
+    - name: <kafka-spring> Build with Gradle
+      run: cd ./kafka-spring && ./gradlew build -x test
+
