@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: devoxx-spring-kafka
+spec:
+  serviceName: devoxx-spring-kafka
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devoxx-spring-kafka
+  template:
+    metadata:
+      labels:
+        app: devoxx-spring-kafka
+    spec:
+      containers:
+        - name: devoxx-spring
+          image: docker.io/gamussa/devoxx-spring-kafka:0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_CONFIG_LOCATION
+              value: /mnt/app/application.yaml
+          volumeMounts:
+            - name: spring-boot-devoxx-spring-kafka-application-yaml
+              mountPath: /mnt/app
+          resources:
+            requests:
+              memory: 512Mi # 768Mi
+              cpu: 500m # 1000m
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 2
+      volumes:
+        - name: spring-boot-devoxx-spring-kafka-application-yaml
+          secret:
+            secretName: spring-boot-devoxx-spring-kafka-application-yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devoxx-spring-kafka
+spec:
+  type: NodePort
+  selector:
+    app: devoxx-spring-kafka
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

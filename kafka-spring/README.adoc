@@ -1,0 +1,26 @@
+= Bootiful Stream Processing with Kafka, Spring and Kubernetes (feat. Kong Ingress Controller)
+
+__more readme tbd__
+
+== build and run
+
+[source,bash]
+.run.sh
+----
+# k3d cluster create #for local cluster
+# or use GCP
+export IMAGE=gamussa/devoxx-spring-kafka:0.1
+export PROJECT_ID=`gcloud config list --format 'value(core.project)'`
+
+gcloud --quiet container --project $PROJECT_ID clusters create portable-serverless-devoxx --num-nodes 2 --machine-type e2-standard-4 --zone europe-central2-a   #<1>
+
+./gradlew bootBuildImage --imageName=$IMAGE && docker push $IMAGE
+
+kubectl create -f https://bit.ly/k4k8s  #<2>
+
+#update ./kubernetes/02_secret.yaml with correct Kafka connection details
+kubectl apply -f  ./kubernetes    #<3>
+----
+<1> you need Kubernetes cluster.
+<2> install Kong Ingress Controller.
+<3> deploy app to Kubernetes cluster.
