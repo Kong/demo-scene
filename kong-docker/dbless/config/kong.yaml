@@ -1,0 +1,12 @@
+# a very minimal declarative config file
+_format_version: "2.1"
+_transform: true
+
+#services:
+#  - name: quote-service
+#    url: http://quotes:8080
+#    routes:
+#      - name: quote-service-routes
+#        paths:
+#          - /
+#        strip_path: true
