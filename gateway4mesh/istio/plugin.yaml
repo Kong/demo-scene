@@ -1,0 +1,9 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: rate-limit
+  namespace: bookinfo
+plugin: rate-limiting
+config:
+  minute: 30
+  policy: local
