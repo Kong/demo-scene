@@ -33,7 +33,7 @@ dependencies {
 
   //grpc stuff
   implementation 'net.devh:grpc-server-spring-boot-starter:2.12.0.RELEASE'
-  implementation "com.google.protobuf:protobuf-java:3.17.3"
+  implementation "com.google.protobuf:protobuf-java:3.18.0"
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'io.projectreactor:reactor-test'
