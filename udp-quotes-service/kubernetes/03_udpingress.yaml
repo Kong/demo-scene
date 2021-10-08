@@ -1,0 +1,13 @@
+apiVersion: configuration.konghq.com/v1beta1
+kind: UDPIngress
+metadata:
+  name: minudp
+  namespace: udpingress-example
+  annotations:
+    kubernetes.io/ingress.class: kong
+spec:
+  rules:
+    - backend:
+        serviceName: udp-quotes-service
+        servicePort: 9990
+      port: 9999

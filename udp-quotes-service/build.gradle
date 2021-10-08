@@ -1,0 +1,67 @@
+plugins {
+  id 'groovy'
+  id 'application'
+  id 'idea'
+  id 'com.google.cloud.tools.jib' version '3.1.4'
+}
+
+group = 'io.kongproxy.developer'
+sourceCompatibility = '11'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  // import a BOM
+  implementation platform('io.projectreactor:reactor-bom:2020.0.11')
+
+  // define dependencies without versions
+  implementation 'io.projectreactor.netty:reactor-netty-core'
+  implementation("com.github.javafaker:javafaker:1.0.2")
+  // Use the latest Groovy version for Spock testing
+  compileOnly 'org.projectlombok:lombok:1.18.20'
+  annotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+  testImplementation 'org.codehaus.groovy:groovy:3.0.8'
+  testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+  testImplementation 'junit:junit:4.13.2'
+
+  //implementation 'com.google.guava:guava:30.1.1-jre'
+  implementation 'org.slf4j:slf4j-api:1.7.32'
+
+  implementation 'com.typesafe:config:1.4.1'
+  implementation 'ch.qos.logback:logback-classic:1.2.6'
+}
+
+application {
+  // Define the main class for the application.
+  mainClass = 'io.kongproxy.developer.udp.App'
+}
+
+tasks.named('test') {
+  // Use JUnit Platform for unit tests.
+  useJUnitPlatform()
+}
+
+jib {
+  from {
+    image = 'bellsoft/liberica-openjdk-alpine:11'
+  }
+  to {
+    //image = "gcr.io/${System.getenv('PROJECT_ID')}/${project.name}:${project.version}"
+    image = "gamussa/${project.name}:${project.version}"
+    credHelper = 'osxkeychain'
+    //tags = ['tag2', 'latest']
+  }
+  container {
+    jvmFlags = ['-Dconfig.override_with_env_vars=true']
+    mainClass = 'io.kongproxy.developer.udp.App'
+    /*jvmFlags = ['-Dmy.property=example.value', '-Xms512m', '-Xdebug']
+    
+    args = ['some', 'args']
+    ports = ['1000', '2000-2003/udp']
+    labels = [key1: 'value1', key2: 'value2']
+    format = 'OCI'*/
+  }
+}
