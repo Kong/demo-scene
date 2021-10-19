@@ -22,6 +22,8 @@ import reactor.netty.udp.UdpInbound;
 import reactor.netty.udp.UdpOutbound;
 import reactor.netty.udp.UdpServer;
 
+import static reactor.core.publisher.Mono.*;
+
 @Slf4j
 public class App {
 
@@ -59,15 +61,16 @@ class MyQuoteHandler implements BiFunction<UdpInbound, UdpOutbound, Publisher<Vo
 
   @Override
   public Publisher<Void> apply(final UdpInbound in, final UdpOutbound out) {
-    return out.sendObject(in.receiveObject()
-                              .map(o -> {
-                                if (o instanceof DatagramPacket) {
-                                  DatagramPacket p = (DatagramPacket) o;
-                                  ByteBuf buf = Unpooled.copiedBuffer(rickAndMorty.quote(), CharsetUtil.UTF_8);
-                                  return new DatagramPacket(buf, p.sender());
-                                } else {
-                                  return Mono.error(new Exception("Unexpected type of the message: " + o));
-                                }
-                              }));
+    return out.sendObject(
+        in.receiveObject()
+            .map(o -> {
+              if (o instanceof DatagramPacket) {
+                var p = (DatagramPacket) o;
+                var buf = Unpooled.copiedBuffer(rickAndMorty.quote(), CharsetUtil.UTF_8);
+                return new DatagramPacket(buf, p.sender());
+              } else {
+                return error(new Exception("Unexpected type of the message: " + o));
+              }
+            }));
   }
 }
