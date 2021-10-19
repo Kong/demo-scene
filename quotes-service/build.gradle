@@ -33,7 +33,8 @@ dependencies {
 
   //grpc stuff
   implementation 'net.devh:grpc-server-spring-boot-starter:2.12.0.RELEASE'
-  implementation "com.google.protobuf:protobuf-java:3.17.3"
+  implementation "com.google.protobuf:protobuf-java:3.18.1"
+  implementation 'net.devh:grpc-server-spring-boot-starter:2.12.0.RELEASE'
   implementation "io.grpc:grpc-stub:1.41.0"
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -64,7 +65,7 @@ protobuf {
   // Configure the protoc executable
   protoc {
     // Download from repositories
-    artifact = 'com.google.protobuf:protoc:3.17.3'
+    artifact = 'com.google.protobuf:protoc:3.18.1'
   }
   plugins {
     grpc {
