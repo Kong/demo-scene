@@ -1,7 +1,7 @@
 apiVersion: configuration.konghq.com/v1beta1
 kind: UDPIngress
 metadata:
-  name: minudp
+  name: udp-quotes-ingress
   namespace: udpingress-example
   annotations:
     kubernetes.io/ingress.class: kong
