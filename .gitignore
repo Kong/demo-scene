@@ -163,3 +163,4 @@ $RECYCLE.BIN/
 
 /kic-prometheus-grafana/.idea/
 .idea
+gateway4mesh/istio/istio-*
