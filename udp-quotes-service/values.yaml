@@ -26,7 +26,7 @@ udpProxy:
 ingressController:
   image:
     repository: kong/kubernetes-ingress-controller
-    tag: "2.0.2"
+    tag: "2.0.3"
   # Specify individual namespaces to watch for ingress configuration. By default,
   # when no namespaces are set, the controller watches all namespaces and uses a
   # ClusterRole to grant access to Kubernetes resources. When you list specific
@@ -34,7 +34,7 @@ ingressController:
   # namespaced-scoped Roles for each of them. Note that watching specific namespaces
   # disables KongClusterPlugin usage, as KongClusterPlugins only exist as cluster resources.
   # Requires controller 2.0.0 or newer.
-  watchNamespaces: [ ]
+  watchNamespaces: [ "udpingress-example" ]
 
 # Annotation to be added to Kong pods
 # required for Kong Prometheus 
