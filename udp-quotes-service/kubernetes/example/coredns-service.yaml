@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns
+  namespace: udpingress-example
+spec:
+  ports:
+    - port: 53
+      protocol: UDP
+      targetPort: 53
+  selector:
+    app: coredns
+  type: ClusterIP
+

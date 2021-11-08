@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: udp-quotes
+  namespace: udpingress-example
+  labels:
+    app: udp-quotes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: udp-quotes
+  template:
+    metadata:
+      labels:
+        app: udp-quotes
+    spec:
+      containers:
+        # TODO: use skaffold
+        #- image: gcr.io/devrel-demos-314917/udp-quotes-service:0.0.1
+        - image: gamussa/udp-quotes-service:0.0.1
+          imagePullPolicy: IfNotPresent
+          name: udp-quotes
+          env:
+            - name: SERVER_PORT
+              value: "9990"
+            - name: SERVER_HOST
+              value: 0.0.0.0
+          ports:
+            - containerPort: 9990
+              protocol: UDP

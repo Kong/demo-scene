@@ -1,0 +1,12 @@
+_format_version: "2.1"
+
+services:
+    - url: udp://quotes:7700
+      name: quotes-service
+
+routes:
+  - id: 0c5fd01e-27ae-11ec-9621-0242ac130002
+    destinations:
+      - port: 9999
+    protocols: ["udp"]
+    service: quotes-service

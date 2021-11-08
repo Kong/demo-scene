@@ -1,0 +1,26 @@
+prometheus:
+  prometheusSpec:
+    scrapeInterval: 10s
+grafana:
+  persistence:
+    enabled: true  # enable persistence using Persistent Volumes
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default' # Configure a dashboard provider file to
+        orgId: 1        # put Kong dashboard into.
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+  dashboards:
+    default:
+      kong-dash:
+        gnetId: 7424  # Install the following Grafana dashboard in the
+        revision: 5   # instance: https://grafana.com/dashboards/7424
+        datasource: Prometheus
+  
+

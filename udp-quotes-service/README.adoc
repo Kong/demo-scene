@@ -1,0 +1,30 @@
+[source,bash]
+.filename
+----
+# Add Kong Helm chart repo
+helm repo add kong https://charts.konghq.com
+helm repo update
+
+# Review and modify values
+helm show values kong/kong > values-default.yaml
+
+# Install Kong via Helm
+helm install kong kong/kong -n kong -f values.yaml
+
+# Upgrade Kong
+helm upgrade kong kong/kong -n kong -f values.yaml 
+
+# deploy nc container to test connectivity 
+kubectl -n udpingress-example run nc -it --rm --image=chilcano/netcat:jessie -- sh
+
+# inside the container 
+nc -u -w1 udp-quotes-service 9990
+# or
+nc -u -w1 udp-quotes-service.udpingress-example.svc 9990
+# or
+nc -u -w1 udp-quotes-service.udpingress-example.svc.cluster.local 9990
+----
+
+
+
+

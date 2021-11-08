@@ -1,0 +1,14 @@
+apiVersion: configuration.konghq.com/v1beta1
+kind: UDPIngress
+metadata:
+  name: minudp
+  namespace: udpingress-example
+  annotations:
+    kubernetes.io/ingress.class: kong
+spec:
+  rules:
+    - backend:
+        serviceName: coredns
+        servicePort: 53
+      port: 9999
+

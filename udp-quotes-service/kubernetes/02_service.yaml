@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: udp-quotes-service
+  namespace: udpingress-example
+spec:
+  ports:
+    - port: 9990
+      protocol: UDP
+  selector:
+    app: udp-quotes
+  type: ClusterIP

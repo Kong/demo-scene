@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns
+  namespace: udpingress-example
+  labels:
+    app: coredns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coredns
+  template:
+    metadata:
+      labels:
+        app: coredns
+    spec:
+      containers:
+        - args:
+            - -conf
+            - /etc/coredns/Corefile
+          image: coredns/coredns
+          imagePullPolicy: IfNotPresent
+          name: coredns
+          ports:
+            - containerPort: 53
+              protocol: UDP
+          volumeMounts:
+            - mountPath: /etc/coredns
+              name: config-volume
+      volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+              - key: Corefile
+                path: Corefile
+            name: coredns
+          name: config-volume
+
