@@ -57,3 +57,6 @@ check-dependencies:
 	@$(call check-dependency,kumactl)
 	@$(call check-dependency,helm)
 	@echo ""
+
+brew-install-dependencies:
+	brew bundle

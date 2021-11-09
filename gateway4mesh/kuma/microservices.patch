@@ -1,0 +1,433 @@
+Index: kubernetes-manifests/checkoutservice.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/checkoutservice.yaml b/kubernetes-manifests/checkoutservice.yaml
+--- a/kubernetes-manifests/checkoutservice.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/checkoutservice.yaml	(date 1636435460223)
+@@ -72,6 +72,8 @@
+ kind: Service
+ metadata:
+   name: checkoutservice
++  annotations:
++    5050.service.kuma.io/protocol: grpc
+ spec:
+   type: ClusterIP
+   selector:
+Index: kubernetes-manifests/recommendationservice.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/recommendationservice.yaml b/kubernetes-manifests/recommendationservice.yaml
+--- a/kubernetes-manifests/recommendationservice.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/recommendationservice.yaml	(date 1636435460263)
+@@ -28,46 +28,48 @@
+       serviceAccountName: default
+       terminationGracePeriodSeconds: 5
+       containers:
+-      - name: server
+-        image: recommendationservice
+-        ports:
+-        - containerPort: 8080
+-        readinessProbe:
+-          periodSeconds: 5
+-          exec:
+-            command: ["/bin/grpc_health_probe", "-addr=:8080"]
+-        livenessProbe:
+-          periodSeconds: 5
+-          exec:
+-            command: ["/bin/grpc_health_probe", "-addr=:8080"]
+-        env:
+-        - name: PORT
+-          value: "8080"
+-        - name: PRODUCT_CATALOG_SERVICE_ADDR
+-          value: "productcatalogservice:3550"
+-        # - name: DISABLE_TRACING
+-        #   value: "1"
+-        # - name: DISABLE_PROFILER
+-        #   value: "1"
+-        # - name: DISABLE_DEBUGGER
+-        #   value: "1"
+-        resources:
+-          requests:
+-            cpu: 100m
+-            memory: 220Mi
+-          limits:
+-            cpu: 200m
+-            memory: 450Mi
++        - name: server
++          image: recommendationservice
++          ports:
++            - containerPort: 8080
++          readinessProbe:
++            periodSeconds: 5
++            exec:
++              command: [ "/bin/grpc_health_probe", "-addr=:8080" ]
++          livenessProbe:
++            periodSeconds: 5
++            exec:
++              command: [ "/bin/grpc_health_probe", "-addr=:8080" ]
++          env:
++            - name: PORT
++              value: "8080"
++            - name: PRODUCT_CATALOG_SERVICE_ADDR
++              value: "productcatalogservice:3550"
++          # - name: DISABLE_TRACING
++          #   value: "1"
++          # - name: DISABLE_PROFILER
++          #   value: "1"
++          # - name: DISABLE_DEBUGGER
++          #   value: "1"
++          resources:
++            requests:
++              cpu: 100m
++              memory: 220Mi
++            limits:
++              cpu: 200m
++              memory: 450Mi
+ ---
+ apiVersion: v1
+ kind: Service
+ metadata:
++  annotations:
++    8080.service.kuma.io/protocol: grpc
+   name: recommendationservice
+ spec:
+   type: ClusterIP
+   selector:
+     app: recommendationservice
+   ports:
+-  - name: grpc
+-    port: 8080
+-    targetPort: 8080
++    - name: grpc
++      port: 8080
++      targetPort: 8080
+Index: src/currencyservice/Dockerfile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/currencyservice/Dockerfile b/src/currencyservice/Dockerfile
+--- a/src/currencyservice/Dockerfile	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/src/currencyservice/Dockerfile	(date 1636436634499)
+@@ -19,7 +19,8 @@
+ # Some packages (e.g. @google-cloud/profiler) require additional
+ # deps for post-install scripts
+ RUN apk add --update --no-cache \
+-    python \
++    curl  \
++    py-pip  \
+     make \
+     g++
+ 
+Index: kubernetes-manifests/emailservice.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/emailservice.yaml b/kubernetes-manifests/emailservice.yaml
+--- a/kubernetes-manifests/emailservice.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/emailservice.yaml	(date 1636435460236)
+@@ -28,42 +28,44 @@
+       serviceAccountName: default
+       terminationGracePeriodSeconds: 5
+       containers:
+-      - name: server
+-        image: emailservice
+-        ports:
+-        - containerPort: 8080
+-        env:
+-        - name: PORT
+-          value: "8080"
+-        # - name: DISABLE_TRACING
+-        #   value: "1"
+-        - name: DISABLE_PROFILER
+-          value: "1"
+-        readinessProbe:
+-          periodSeconds: 5
+-          exec:
+-            command: ["/bin/grpc_health_probe", "-addr=:8080"]
+-        livenessProbe:
+-          periodSeconds: 5
+-          exec:
+-            command: ["/bin/grpc_health_probe", "-addr=:8080"]
+-        resources:
+-          requests:
+-            cpu: 100m
+-            memory: 64Mi
+-          limits:
+-            cpu: 200m
+-            memory: 128Mi
++        - name: server
++          image: emailservice
++          ports:
++            - containerPort: 8080
++          env:
++            - name: PORT
++              value: "8080"
++            # - name: DISABLE_TRACING
++            #   value: "1"
++            - name: DISABLE_PROFILER
++              value: "1"
++          readinessProbe:
++            periodSeconds: 5
++            exec:
++              command: [ "/bin/grpc_health_probe", "-addr=:8080" ]
++          livenessProbe:
++            periodSeconds: 5
++            exec:
++              command: [ "/bin/grpc_health_probe", "-addr=:8080" ]
++          resources:
++            requests:
++              cpu: 100m
++              memory: 64Mi
++            limits:
++              cpu: 200m
++              memory: 128Mi
+ ---
+ apiVersion: v1
+ kind: Service
+ metadata:
++  annotations:
++    5000.service.kuma.io/protocol: grpc
+   name: emailservice
+ spec:
+   type: ClusterIP
+   selector:
+     app: emailservice
+   ports:
+-  - name: grpc
+-    port: 5000
+-    targetPort: 8080
++    - name: grpc
++      port: 5000
++      targetPort: 8080
+Index: kubernetes-manifests/redis.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/redis.yaml b/kubernetes-manifests/redis.yaml
+--- a/kubernetes-manifests/redis.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/redis.yaml	(date 1636435460267)
+@@ -55,6 +55,8 @@
+ apiVersion: v1
+ kind: Service
+ metadata:
++  annotations:
++    6379.service.kuma.io/protocol: tcp
+   name: redis-cart
+ spec:
+   type: ClusterIP
+Index: src/paymentservice/Dockerfile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/paymentservice/Dockerfile b/src/paymentservice/Dockerfile
+--- a/src/paymentservice/Dockerfile	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/src/paymentservice/Dockerfile	(date 1636436385226)
+@@ -19,7 +19,8 @@
+ # Some packages (e.g. @google-cloud/profiler) require additional
+ # deps for post-install scripts
+ RUN apk add --update --no-cache \
+-    python \
++    curl \
++    py-pip \
+     make \
+     g++ 
+ 
+Index: kubernetes-manifests/adservice.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/adservice.yaml b/kubernetes-manifests/adservice.yaml
+--- a/kubernetes-manifests/adservice.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/adservice.yaml	(date 1636435460211)
+@@ -63,6 +63,8 @@
+ kind: Service
+ metadata:
+   name: adservice
++  annotations:
++    9555.service.kuma.io/protocol: grpc
+ spec:
+   type: ClusterIP
+   selector:
+Index: kubernetes-manifests/currencyservice.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/currencyservice.yaml b/kubernetes-manifests/currencyservice.yaml
+--- a/kubernetes-manifests/currencyservice.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/currencyservice.yaml	(date 1636435460230)
+@@ -60,6 +60,8 @@
+ kind: Service
+ metadata:
+   name: currencyservice
++  annotations:
++    7000.service.kuma.io/protocol: grpc
+ spec:
+   type: ClusterIP
+   selector:
+Index: kubernetes-manifests/shippingservice.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/shippingservice.yaml b/kubernetes-manifests/shippingservice.yaml
+--- a/kubernetes-manifests/shippingservice.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/shippingservice.yaml	(date 1636435460274)
+@@ -60,6 +60,8 @@
+ apiVersion: v1
+ kind: Service
+ metadata:
++  annotations:
++    50051.service.kuma.io/protocol: grpc
+   name: shippingservice
+ spec:
+   type: ClusterIP
+Index: kubernetes-manifests/cartservice.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/cartservice.yaml b/kubernetes-manifests/cartservice.yaml
+--- a/kubernetes-manifests/cartservice.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/cartservice.yaml	(date 1636435460217)
+@@ -56,6 +56,8 @@
+ kind: Service
+ metadata:
+   name: cartservice
++  annotations:
++    7070.service.kuma.io/protocol: grpc
+ spec:
+   type: ClusterIP
+   selector:
+Index: kubernetes-manifests/productcatalogservice.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/productcatalogservice.yaml b/kubernetes-manifests/productcatalogservice.yaml
+--- a/kubernetes-manifests/productcatalogservice.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/productcatalogservice.yaml	(date 1636435460257)
+@@ -61,6 +61,8 @@
+ kind: Service
+ metadata:
+   name: productcatalogservice
++  annotations:
++    3555.service.kuma.io/protocol: grpc
+ spec:
+   type: ClusterIP
+   selector:
+Index: kubernetes-manifests/frontend.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/frontend.yaml b/kubernetes-manifests/frontend.yaml
+--- a/kubernetes-manifests/frontend.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/frontend.yaml	(date 1636435460248)
+@@ -90,6 +90,8 @@
+ kind: Service
+ metadata:
+   name: frontend
++  annotations:
++    8080.service.kuma.io/protocol: http
+ spec:
+   type: ClusterIP
+   selector:
+@@ -98,16 +100,4 @@
+   - name: http
+     port: 80
+     targetPort: 8080
+----
+-apiVersion: v1
+-kind: Service
+-metadata:
+-  name: frontend-external
+-spec:
+-  type: LoadBalancer
+-  selector:
+-    app: frontend
+-  ports:
+-  - name: http
+-    port: 80
+-    targetPort: 8080
++---
+\ No newline at end of file
+Index: kubernetes-manifests/paymentservice.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kubernetes-manifests/paymentservice.yaml b/kubernetes-manifests/paymentservice.yaml
+--- a/kubernetes-manifests/paymentservice.yaml	(revision 884439c7437cab8d66da4657d8043278e01c33dc)
++++ b/kubernetes-manifests/paymentservice.yaml	(date 1636435460253)
+@@ -28,36 +28,38 @@
+       serviceAccountName: default
+       terminationGracePeriodSeconds: 5
+       containers:
+-      - name: server
+-        image: paymentservice
+-        ports:
+-        - containerPort: 50051
+-        env:
+-        - name: PORT
+-          value: "50051"
+-        readinessProbe:
+-          exec:
+-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+-        livenessProbe:
+-          exec:
+-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+-        resources:
+-          requests:
+-            cpu: 100m
+-            memory: 64Mi
+-          limits:
+-            cpu: 200m
+-            memory: 128Mi
++        - name: server
++          image: paymentservice
++          ports:
++            - containerPort: 50051
++          env:
++            - name: PORT
++              value: "50051"
++          readinessProbe:
++            exec:
++              command: [ "/bin/grpc_health_probe", "-addr=:50051" ]
++          livenessProbe:
++            exec:
++              command: [ "/bin/grpc_health_probe", "-addr=:50051" ]
++          resources:
++            requests:
++              cpu: 100m
++              memory: 64Mi
++            limits:
++              cpu: 200m
++              memory: 128Mi
+ ---
+ apiVersion: v1
+ kind: Service
+ metadata:
++  annotations:
++    50051.service.kuma.io/protocol: grpc
+   name: paymentservice
+ spec:
+   type: ClusterIP
+   selector:
+     app: paymentservice
+   ports:
+-  - name: grpc
+-    port: 50051
+-    targetPort: 50051
++    - name: grpc
++      port: 50051
++      targetPort: 50051

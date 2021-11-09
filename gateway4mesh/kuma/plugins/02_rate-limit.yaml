@@ -1,0 +1,9 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: rate-limit
+  namespace: boutique
+plugin: rate-limiting
+config:
+  minute: 20
+  policy: local
