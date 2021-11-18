@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: kong
+    external-dns.alpha.kubernetes.io/hostname: shop.kongproxy.me
+  name: frontend
+  namespace: boutique
+spec:
+  tls:
+    - secretName: shop-kongproxy-me
+      hosts:
+        - shop.kongproxy.me
+  rules:
+    - host: shop.kongproxy.me
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80

@@ -1,0 +1,30 @@
+gke-check-dependencies: check-dependencies
+	@$(call check-var-defined,GCP_PROJECT_ID)
+	@$(call check-dependency,gcloud)
+	@$(call echo_pass,gke-base dependencies verified)
+
+gke-create-cluster: gke-check-dependencies
+	@$(call print-header,"Creating a new cluster Creating GKE")
+	@$(call print-prompt)
+	gcloud beta --quiet container --project $(GCP_PROJECT_ID) clusters create ${CLUSTER_NAME} --num-nodes 4 --machine-type $(GKE_BASE_MACHINE_TYPE) --zone ${CLUSTER_ZONE}
+	export PROJECT_ID=${GCP_PROJECT_ID}
+
+gke-enable-apis: gke-check-dependencies
+	gcloud services enable container.googleapis.com --project ${GCP_PROJECT_ID}
+	gcloud services enable monitoring.googleapis.com cloudtrace.googleapis.com clouddebugger.googleapis.com cloudprofiler.googleapis.com --project ${GCP_PROJECT_ID}
+
+gke-enable-cloud-run: gke-check-dependencies
+	@$(call print-header,"Enabling CloudRun APIs")
+	@$(call print-prompt)
+	gcloud services enable cloudapis.googleapis.com container.googleapis.com containerregistry.googleapis.com run.googleapis.com --project=${GCP_PROJECT_ID}
+
+gke-scale-cluster-%: gke-check-dependencies
+	@$(call print-header,"Scaling my ${CLUSTER_NAME}")
+	@$(call print-prompt)
+	gcloud --quiet container clusters resize ${CLUSTER_NAME} --num-nodes=$* --zone ${CLUSTER_ZONE}
+
+gke-destroy-cluster: gke-check-dependencies 
+	@$(call print-header, "Delete GKE cluster")
+	@$(call print-prompt)
+	gcloud --quiet container --project $(GCP_PROJECT_ID) clusters delete ${CLUSTER_NAME} --zone ${CLUSTER_ZONE} 
+	@$(call echo_stdout_footer_pass,GKE Cluster Deleted)
