@@ -36,8 +36,8 @@ spec:
               path: /actuator/health
               port: 8080
             initialDelaySeconds: 5
-            periodSeconds: 10
-            failureThreshold: 2
+            periodSeconds: 20
+            failureThreshold: 5
       volumes:
         - name: spring-boot-devoxx-spring-kafka-application-yaml
           secret:
