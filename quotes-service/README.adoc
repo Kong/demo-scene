@@ -23,7 +23,7 @@ kubectl create -f https://bit.ly/k4k8s      #<6>
 
 kubectl apply -f ./kubernetes       #<7>
 ----
-<1> Create Kubernetes cluster in GCP.
+<1> Create a Kubernetes cluster in GCP.
 <2> Build an image.
 <3> Push an image to Docker Hub.
 <4> Run microservice app locally. 

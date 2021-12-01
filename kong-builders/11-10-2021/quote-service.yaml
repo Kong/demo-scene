@@ -1,0 +1,10 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: quote-service
+spec:
+  template:
+    spec:
+      containers:
+        #- image: gamussa/reactive-quote-service:0.0.4-SNAPSHOT
+        - image: gamussa/native-quote-service:0.0.4-SNAPSHOT

@@ -1,0 +1,70 @@
+= Kong Builders 11-10-2021
+
+A demo setup of Knative and kong integration (featuring Spring Boot Native).
+
+== setup
+
+[source,bash]
+.commands.sh
+----
+gcloud container clusters create kong-builders --zone=us-east1-c --num-nodes=3 --enable-ip-alias --scopes=cloud-platform  #<1>
+
+kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value core/account)  #<2>
+
+kubectl apply -f https://github.com/knative/serving/releases/download/v0.26.1/serving-crds.yaml   #<3>
+kubectl apply -f https://github.com/knative/serving/releases/download/v0.26.1/serving-core.yaml   #<4>
+
+helm repo update  # optional
+kubectl create namespace kong && helm install kong -n kong kong/kong   #<5>
+
+kubectl patch configmap/config-network --namespace knative-serving --type merge --patch '{"data":{"ingress.class":"kong"}}' #<6>
+
+# get Kong Load balancer IP
+until [ -n "$(kubectl get service kong-kong-proxy -n kong \
+  -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do
+    sleep 10
+done
+
+export IP=$(kubectl get service kong-kong-proxy -n kong \
+  -o jsonpath="{.status.loadBalancer.ingress[*].ip}")
+
+echo $IP
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-domain
+  namespace: knative-serving
+data:
+  $IP.sslip.io: ""
+EOF
+
+cat <<EOF | kubectl apply -f -
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: helloworld-go
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/knative-samples/helloworld-go
+EOF
+
+echo http://helloworld-go.default.$IP.sslip.io
+
+http  http://helloworld-go.default.$IP.sslip.io
+
+cd native-quote-service
+export IMAGE=gamussa/reactive-quote-service:0.0.4-SNAPSHOT
+./gradlew bootBuildImage --imageName=$IMAGE && docker push $IMAGE
+----
+<1> create a Kubernetes cluster in GCP.
+<2> create a cluster binding.
+<3> Install Knative Serving CRDs.
+<4> Install Knative Service Core.
+<5> Install Kong using Helm.
+<6> Tell Knative Serving to use the Kong Ingress Controller.
+
+

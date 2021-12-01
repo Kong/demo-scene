@@ -1,0 +1,40 @@
+plugins {
+  id 'org.springframework.boot' version '2.6.1'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'java'
+  id 'org.springframework.experimental.aot' version '0.11.0-RC1'
+}
+
+group = 'io.kong.developer'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+  maven { url 'https://repo.spring.io/milestone' }
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-webflux'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'io.projectreactor:reactor-test'
+  implementation "com.github.javafaker:javafaker:1.0.2"
+
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+}
+
+test {
+  useJUnitPlatform()
+}
+
+bootBuildImage {
+  builder = 'paketobuildpacks/builder:tiny'
+  environment = ['BP_NATIVE_IMAGE'                : 'true',
+                 'BP_NATIVE_IMAGE_BUILD_ARGUMENTS': '-H:Log=registerResource:3 -Dspring.spel.ignore=true -Dspring.native.remove-yaml-support=true']
+  imageName = "gamussa/native-quote-service:0.0.4-SNAPSHOT"
+  verboseLogging = true
+}
+  
+  
