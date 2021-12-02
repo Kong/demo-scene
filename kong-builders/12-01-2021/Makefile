@@ -29,12 +29,12 @@ istio-install: gke-check-dependencies
 
 	if [ -d "./istio-${ISTIO_VERSION}" ]; then \
 		echo "${REST}${BLUE}Found ./istio-${ISTIO_VERSION} ${REST}"; \
-		install -m 755 ./istio-${ISTIO_VERSION}/bin/istioctl ~/bin/istioctl; \
 	else \
 		echo "No Istio installation found"; \
 		echo "${GREEN}Downloading Istio...${RESET}" ;\
 		@curl -s -L https://istio.io/downloadIstio | ISTIO_VERSION=${ISTIO_VERSION} sh - ;\
 	fi
+	install -m 755 ./istio-${ISTIO_VERSION}/bin/istioctl ~/bin/istioctl; 
 	istioctl x precheck
 	istioctl install --set profile=default -y
 
