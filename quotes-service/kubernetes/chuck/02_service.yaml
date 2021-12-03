@@ -5,7 +5,7 @@ metadata:
     app.dekorate.io/vcs-url: <<unknown>>
   labels:
     app.kubernetes.io/name: chuck-quote-service
-    app.kubernetes.io/version: 0.0.2
+    app.kubernetes.io/version: 0.0.4-SNAPSHOT
   name: chuck-quote-service
 spec:
   ports:
@@ -14,4 +14,4 @@ spec:
       targetPort: 8080
   selector:
     app.kubernetes.io/name: chuck-quote-service
-    app.kubernetes.io/version: 0.0.2
+    app.kubernetes.io/version: 0.0.4-SNAPSHOT

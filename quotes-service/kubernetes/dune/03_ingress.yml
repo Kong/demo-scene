@@ -1,20 +1,20 @@
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: dune-quote-service
   annotations:
     konghq.com/protocols: grpc,grpcs
-    kubernetes.io/ingress.class: kong
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: dune.kongproxy.me
 spec:
+  ingressClassName: kong
   tls:
-    - secretName: kong.gamov.dev
+    - secretName: dune-kongproxy-me
       hosts:
-        - kong.gamov.dev
+        - dune.kongproxy.me
   rules:
-    - host: kong.gamov.dev
+    - host: dune.kongproxy.me
       http:
         paths:
           - path: /
