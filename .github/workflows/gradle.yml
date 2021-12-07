@@ -29,4 +29,8 @@ jobs:
       run: cd ./kafka-spring && chmod +x gradlew
     - name: <kafka-spring> Build with Gradle
       run: cd ./kafka-spring && ./gradlew build -x test
+    - name: <native-quote-service> Grant execute permission for gradlew
+      run: cd ./kong-builders/11-10-2021/native-quote-service && chmod +x gradlew
+    - name: <native-quote-service> Build with Gradle
+      run: cd ./kong-builders/11-10-2021/native-quote-service && ./gradlew build -x test
 
