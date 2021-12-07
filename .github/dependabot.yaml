@@ -3,6 +3,15 @@
 version: 2
 updates:
   - package-ecosystem: "gradle"
+    directory: "/kong-builders/11-10-2021/native-quote-service"
+    schedule:
+      interval: "weekly"
+    # Add reviewers
+    reviewers:
+      - "gamussa"
+    # Allow up to 10 open pull requests for gradle dependencies
+    open-pull-requests-limit: 10
+  - package-ecosystem: "gradle"
     directory: "/quotes-service" 
     schedule:
       interval: "weekly"

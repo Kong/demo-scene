@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: chuck-dev
+        protocol: HTTP
+      hosts:
+        - 'chuck.dev'
+    - port:
+        number: 80
+        name: backtofuture-dev
+        protocol: HTTP
+      hosts:
+        - 'backtofuture.dev'

@@ -2,7 +2,7 @@ SHELL=/bin/bash
 THIS_MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 THIS_MKFILE_DIR := $(dir $(THIS_MKFILE_PATH))
 
-include $(THIS_MKFILE_DIR)../common/Makefile
+include $(THIS_MKFILE_DIR)../../common/Makefile
 
 GCP_PROJECT_ID ?= $(shell gcloud config list --format 'value(core.project)')
 GKE_BASE_MACHINE_TYPE ?= e2-standard-2
