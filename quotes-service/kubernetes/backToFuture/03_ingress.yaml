@@ -1,20 +1,20 @@
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: back2future-ingress
   annotations:
     konghq.com/strip-path: "true"
-    kubernetes.io/ingress.class: kong
-    # konghq.com/plugins: rate-free-tier
+    konghq.com/plugins: rate-free-tier
+    external-dns.alpha.kubernetes.io/hostname: back2future.kongproxy.me
 spec:
+  ingressClassName: kong
   rules:
-    - http:
+    - host: back2future.kongproxy.me
+      http:
         paths:
-          - path: /back2future
-            pathType: Prefix
+          - pathType: ImplementationSpecific
             backend:
               service:
                 name: back2future-quote-service
                 port:
-                  number: 80
+                  number: 8080

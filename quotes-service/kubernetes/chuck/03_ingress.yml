@@ -4,16 +4,17 @@ metadata:
   name: chuck-quote-services
   annotations:
     konghq.com/strip-path: "true"
-    kubernetes.io/ingress.class: kong
-    # konghq.com/plugins: user1-auth,rate-paid-tier,platinum-paid-tier
+    external-dns.alpha.kubernetes.io/hostname: chuck.kongproxy.me
+    konghq.com/plugins: user1-auth,rate-paid-tier,platinum-paid-tier
 spec:
+  ingressClassName: kong
   rules:
-    - http:
+    - host: chuck.kongproxy.me
+      http:
         paths:
-          - path: /chuck
-            pathType: Prefix
-            backend:
+          - backend:
               service:
                 name: chuck-quote-service
                 port:
                   number: 8080
+            pathType: ImplementationSpecific
