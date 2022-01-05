@@ -1,0 +1,217 @@
+openapi: 3.0.0
+info:
+  title: Summit Demo
+  version: "1.0"
+  license:
+    name: MIT
+  contact:
+    email: michael.heap@konghq.com
+    name: Michael Heap
+    url: https://konghq.com
+  description: Summit Demo API
+  termsOfService: https://konghq.com/terms/
+servers:
+  - url: "https://summit-demo.com"
+paths:
+  /products:
+    get:
+      summary: List Kong products
+      tags:
+        - product
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: "List of kong products matching the provided filters"
+                uniqueItems: true
+                items:
+                  $ref: "#/components/schemas/Product"
+              examples:
+                success:
+                  value:
+                    - name: Gateway
+                      type: oss
+                      description: Kong or Kong API Gateway is a cloud-native, platform-agnostic, scalable API Gateway distinguished for its high performance and extensibility via plugins.
+                    - name: Insomnia
+                      type: oss
+                      description: Insomnia is an open-source, cross-platform API Client for GraphQL, REST, and gRPC.
+                    - name: Developer Portal
+                      type: enterprise
+                      description: The Kong Developer Portal provides a single source of truth for all developers to locate, access, and consume services. With intuitive content management for documentation, streamlined developer onboarding, and role-based access control (RBAC), Kong’s Developer Portal provides a comprehensive solution for creating and customizing a unified developer experience.
+                no-products:
+                  value: []
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalid-type:
+                  value:
+                    type: "https://docs.konghq.com/problem/summit/invalid-type"
+                    title: Invalid type provided
+                    detail: "[ee] is an invalid value. Possible values: [oss, enterprise]"
+                    instance: "t:beQpT0Hn"
+      operationId: list-products
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - oss
+              - enterprise
+          in: query
+          name: type
+          description: Only show products that match the provided `type`
+      description: Fetch information about the products that Kong offer.
+  /sessions:
+    get:
+      summary: List Summit sessions
+      tags:
+        - session
+      parameters:
+        - schema:
+            type: string
+            format: date
+            example: "2021-09-28"
+          in: query
+          name: date
+          description: Show sessions on the provided date
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+              examples:
+                success:
+                  value:
+                    - title: Controlling Your Kong Gateway With decK and CI/CD
+                      description: |
+                        We used to configure services by hand, then came tools such as Puppet, Chef and Ansible. Then we used to build infrastructure by hand, and we got tools like Terraform and Pulumi. So why are we still configuring routes and plugins in Kong manually?
+
+                        This session will introduce you to Kong’s declarative configuration capabilities and how to use your CI system to lint and apply these configurations in a variety of environments. Test your changes in a staging environment, then apply exactly the same config to production with a click of a button.
+                      presenters:
+                        - Michael Heap
+                      date: 2021-09-28
+
+                    - title: "Work Smarter, Not Harder: Using ML to Observe Your Kuma API Metrics"
+                      description: |
+                        Observability is catching on these days as the de-facto way to provide visibility into essential aspects of systems. It would be unwise for you not to leverage it with Kuma service mesh — the place that allows your services to communicate with the rest of the world. However, many observability solutions restrict themselves to the works: simple metric collection that provides them with dashboards. Expecting users to simply sit on their chairs and look at those metrics all day long is an invitation to failure, as we know that one can only do so much when they get tired and bored.
+
+                        This talk will change the status quo and show how you can work smart by combining the flexibility of Kuma with the power of the Elastic Stack to ingest, store and analyze massive amounts of data. Join to learn how to collect metrics from Kuma via Prometheus, bring these metrics into Elasticsearch using Metricbeat and create machine learning jobs to look for anomalies that can alert you when something interesting happens.
+                      presenters:
+                        - Ricardo Ferreira
+                        - Viktor Gamov
+                      date: 2021-09-29
+
+      operationId: list-sessions
+      description: List all sessions being presented at Kong Summit
+
+  "/sessions/{id}":
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        description: The ID of the session to load
+    get:
+      summary: Fetch Summit session
+      tags:
+        - session
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+              examples:
+                success:
+                  value:
+                    title: Controlling Your Kong Gateway With decK and CI/CD
+                    description: |
+                      We used to configure services by hand, then came tools such as Puppet, Chef and Ansible. Then we used to build infrastructure by hand, and we got tools like Terraform and Pulumi. So why are we still configuring routes and plugins in Kong manually?
+
+                      This session will introduce you to Kong’s declarative configuration capabilities and how to use your CI system to lint and apply these configurations in a variety of environments. Test your changes in a staging environment, then apply exactly the same config to production with a click of a button.
+                    presenters:
+                      - Michael Heap
+                    date: 2021-09-28
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalid-id:
+                  value:
+                    type: "https://docs.konghq.com/problem/summit/invalid-id"
+                    title: Session could not be found
+                    detail: "The session with ID [x87an] could not be found"
+                    instance: "t:dbmwRKNA"
+
+      operationId: get-session
+      description: "Get detailed information about a session"
+components:
+  schemas:
+    Product:
+      description: A product that Kong offers
+      type: object
+      required:
+        - name
+        - type
+        - description
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+    Session:
+      description: A session that is being presented at Kong Summit
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        presenters:
+          type: array
+          items:
+            type: string
+        date:
+          type: string
+          format: date
+      required:
+        - title
+        - description
+        - presenters
+      title: ""
+    Error:
+      description: "An RFC7807 formatted error"
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+      required:
+        - type
+        - title
+        - instance
+tags:
+  - name: product
+  - name: session

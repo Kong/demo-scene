@@ -1,0 +1,27 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["linux-musl"]
+}
+
+model Product {
+  id          Int    @id @default(autoincrement())
+  name        String @unique @db.VarChar(255)
+  type        String @db.VarChar(10)
+  description String @db.Text
+}
+
+model Session {
+  id          Int      @id @default(autoincrement())
+  title       String   @unique @db.VarChar(255)
+  description String   @db.Text
+  date        DateTime @default(now())
+  presenters  Json
+}
