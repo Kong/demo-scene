@@ -1,0 +1,10 @@
+          plugins:
+          - name: rate-limiting
+            enabled: true
+            protocols:
+            - http
+            config:
+              fault_tolerant: true
+              limit_by: ip
+              minute: 5
+              policy: local

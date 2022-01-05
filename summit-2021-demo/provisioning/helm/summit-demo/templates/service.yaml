@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "summit-demo.fullname" . }}
+  labels:
+    {{- include "summit-demo.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.internalPort }}
+      nodePort: {{ .Values.service.exposePort }} 
+      targetPort: {{ .Values.service.targetPort }} 
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "summit-demo.selectorLabels" . | nindent 4 }}

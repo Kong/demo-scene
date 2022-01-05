@@ -1,0 +1,11 @@
+_id: ut_f7bd2226c9ac4ae384378415c7523547
+type: UnitTest
+parentId: uts_22d7b238e0274b979c962811e98a0999
+modified: 1631733918924
+created: 1631707658486
+requestId: req_wrk_f4b71dd676c24528a284d4cce0b2e5017d98e616
+name: Returns a list
+code: |
+  const sessions = await insomnia.send();
+  const body = JSON.parse(sessions.data);
+  expect(body).to.be.a('array');
