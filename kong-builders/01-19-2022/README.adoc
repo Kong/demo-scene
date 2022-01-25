@@ -40,7 +40,7 @@ bar
 $ kind create cluster --config kind-cluster.yaml  #<1>
 $ kubectl apply -f https://bit.ly/k4k8s #<2>
 $ kubectl patch deployment -n kong ingress-kong -p "$(cat deployment-patch.json)" #<3>
-$ kubectl patch deployment -n kong ingress-kong -p "$(cat service-patch.json)"  #<4>
+$ kubectl patch service -n kong ingress-kong -p "$(cat service-patch.json)"  #<4>
 $ kubectl apply -f usage.yaml #<5>
 $ kubectl patch ingress example-ingress -p '{"spec":{"ingressClassName":"kong"}}' #<6>
 ----
