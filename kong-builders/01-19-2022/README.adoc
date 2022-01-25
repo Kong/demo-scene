@@ -1,0 +1,52 @@
+= Kong Builders 1/19/2022
+
+== Local development in Kubernetes with Kong using minikube
+
+[source,bash]
+.minikube.sh
+----
+$ minikube start  #<1>
+$ kubectl apply -f https://bit.ly/k4k8s #<2>
+$ minikube tunnel   #<3>
+$ kubectl apply -f usage.yaml #<4>
+$ kubectl patch ingress example-ingress -p '{"spec":{"ingressClassName":"kong"}}' #<5>
+$ curl -i localhost/bar #<6> 
+
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+Content-Length: 4
+Connection: keep-alive
+X-App-Name:
+X-App-Version: 0.2.4
+Date: Tue, 25 Jan 2022 23:12:42 GMT
+X-Kong-Upstream-Latency: 0
+X-Kong-Proxy-Latency: 0
+Via: kong/2.7.0
+
+bar
+----
+<1> start minikube.
+<2> install Kong Ingress Controller.
+<3> run minikube tunnel command in a separate terminal window.
+<4> deploy two services and ingress.
+<5> patch Ingress to use Kong.
+<6> test service `bar.
+
+== Local development in Kubernetes with Kong using kind
+
+[source, bash]
+.kind.sh
+----
+$ kind create cluster --config kind-cluster.yaml  #<1>
+$ kubectl apply -f https://bit.ly/k4k8s #<2>
+$ kubectl patch deployment -n kong ingress-kong -p "$(cat deployment-patch.json)" #<3>
+$ kubectl patch deployment -n kong ingress-kong -p "$(cat service-patch.json)"  #<4>
+$ kubectl apply -f usage.yaml #<5>
+$ kubectl patch ingress example-ingress -p '{"spec":{"ingressClassName":"kong"}}' #<6>
+----
+<1> create cluster with extra port mappings.
+<2> Install Kong Ingress Controller.
+<3> changed deployment to enforce node affinity 
+<4> changed service from LoadBalancer to NodePort
+<5> deploy ingress with `ingressClassName` kong
+<6> patch Ingress to use Kong.
