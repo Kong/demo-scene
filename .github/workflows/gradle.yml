@@ -65,8 +65,10 @@ jobs:
       matrix:
         java: [ '11', '17' ]
     name: Kafka Spring App - build with ${{ matrix.Java }}
+    
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up JDK ${{ matrix.Java }}
         uses: actions/setup-java@v2
         with:
@@ -91,6 +93,7 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'liberica'
+      - name: <native-quote-service> Grant execute permission for gradlew
         run: cd ./kong-builders/11-10-2021/native-quote-service && chmod +x gradlew
       - name: <native-quote-service> Build with Gradle
         run: cd ./kong-builders/11-10-2021/native-quote-service && ./gradlew build -x test
