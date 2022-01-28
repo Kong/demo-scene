@@ -32,7 +32,7 @@ dependencies {
   annotationProcessor 'org.projectlombok:lombok'
 
   //grpc stuff
-  implementation 'net.devh:grpc-server-spring-boot-starter:2.13.0.RELEASE'
+  implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
   implementation "com.google.protobuf:protobuf-java:3.19.1"
   implementation "io.grpc:grpc-stub:1.42.1"
 
