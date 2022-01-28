@@ -47,10 +47,12 @@ jobs:
         run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-amd64
       - name: Build Docker Image ARM64 
         run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-arm64 --builder docker.io/dmikusa2pivotal/builder:focal
+      - name: Push to Docker Hub
+        run: docker push gamussa/reactive-quote-service:latest-amd64 && docker push gamussa/reactive-quote-service:latest-arm64
       - name: Create multiarch manifest
         run: docker manifest create gamussa/reactive-quote-service:latest --amend gamussa/reactive-quote-service:latest-amd64 --amend gamussa/reactive-quote-service:latest-arm64
-      - name: Push to Docker Hub
-        run: docker push gamussa/reactive-quote-service:manifest-amd64 && docker push gamussa/reactive-quote-service:manifest-arm64 && docker manifest push gamussa/reactive-quote-service:latest
+      - name: Push Manifest to Docker Hub
+        run: docker manifest push gamussa/reactive-quote-service:latest
   
   rest:
 
