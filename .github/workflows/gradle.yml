@@ -12,15 +12,12 @@ on:
 jobs:
   
   quotes-service:
-    defaults: 
-      run: 
+    defaults:
+      run:
         working-directory: quotes-service
     runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        java: [ '11' ]
-    #name: Running tests with Java ${{ matrix.Java }}
-    name: Running tests with Java 11
+    
+    name: Build (jar and docker) Reactive Quotes Service app
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -39,29 +36,35 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-        
-      - name: Build Docker Image AMD64 
+
+      - name: Build Docker Image AMD64
         run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-amd64
-      - name: Build Docker Image ARM64 
+
+      - name: Build Docker Image ARM64
         run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-arm64 --builder docker.io/dmikusa2pivotal/builder:focal
+
       - name: Push to Docker Hub
         run: docker push gamussa/reactive-quote-service:latest-amd64 && docker push gamussa/reactive-quote-service:latest-arm64
+
       - name: Create multiarch manifest
         run: docker manifest create gamussa/reactive-quote-service:latest --amend gamussa/reactive-quote-service:latest-amd64 --amend gamussa/reactive-quote-service:latest-arm64
+
       - name: Push Manifest to Docker Hub
         run: docker manifest push gamussa/reactive-quote-service:latest
   
-  rest:
-
+  kafka-app:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: kafka-spring
+    
     strategy:
       matrix:
         java: [ '11', '17' ]
-    name: Running tests with Java ${{ matrix.Java }}
+    name: Kafka Spring App - build with ${{ matrix.Java }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK ${{ matrix.Java }}
@@ -69,11 +72,25 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'liberica'
-      - name: <kafka-spring> Grant execute permission for gradlew
-        run: cd ./kafka-spring && chmod +x gradlew
-      - name: <kafka-spring> Build with Gradle
-        run: cd ./kafka-spring && ./gradlew build -x test
-      - name: <native-quote-service> Grant execute permission for gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+  
+  misc:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java: [ '11', '17' ]
+    name: Misc. projects Running tests with Java ${{ matrix.Java }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.Java }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'liberica'
         run: cd ./kong-builders/11-10-2021/native-quote-service && chmod +x gradlew
       - name: <native-quote-service> Build with Gradle
         run: cd ./kong-builders/11-10-2021/native-quote-service && ./gradlew build -x test
