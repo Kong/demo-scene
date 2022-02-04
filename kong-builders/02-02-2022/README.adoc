@@ -1,0 +1,25 @@
+= Kong Builders, episode 02-02-2022
+
+== tools and links
+
+* https://docs.konghq.com/kubernetes-ingress-controller/[KIC]
+* https://github.com/derailed/k9s[k9s]
+* https://www.youtube.com/watch?v=lYm912ANi_E&t=1070s[this episode video]
+
+== commands used in this episode 
+
+[source,bash]
+.script.sh
+----
+helm repo add kong https://charts.konghq.com  #<1>
+helm repo update  #<2>
+helm install kong -n kong kong/kong #<3>
+helm show values kong/kong > values-default.yaml  #<4>
+helm upgrade kong -n kong kong/kong -f values.yaml  #<5>
+----
+<1> Add kong helm charts repo.
+<2> Update local helm repo cache.
+<3> Install default kong installation.
+<4> Save default values in file.
+<5> Upgrade kong ingress controller installation.  
+
