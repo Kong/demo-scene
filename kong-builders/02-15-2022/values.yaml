@@ -68,10 +68,15 @@ image:
     #   - myRegistrKeySecretName
     
 env:
-  database: "off"
+  #database: "off"
+  database: "postgres"
+  pg_user: "kong"
+  pg_password: "kong"
+  pg_database: "kong"
+  ph_host: "kong-postgresql"
   admin_api_uri: "http://admin.kongproxy.me"
-  #admin_gui_url: "http://manager.kongproxy.me"
-  admin_gui_url: "http://34.139.235.182:8002/"
+  admin_gui_url: "http://manager.kongproxy.me"
+  #admin_gui_url: "http://34.139.235.182:8002/"
   
 manager:
   # Enable creating a Kubernetes service for Kong Manager
@@ -120,14 +125,15 @@ manager:
     
 enterprise:
   enabled: true
+  license_secret: kong-enterprise-license
   vitals:
     enabled: true
-
+    
 # PostgreSQL chart documentation:
 # https://github.com/bitnami/charts/blob/master/bitnami/postgresql/README.md
 
 postgresql:
-  enabled: false
+  enabled: true
   postgresqlUsername: kong
   postgresqlDatabase: kong
   postgresqlPassword: kong  

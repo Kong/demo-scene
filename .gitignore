@@ -166,3 +166,4 @@ $RECYCLE.BIN/
 istio-*
 gateway4mesh/kuma/kong-mesh-*
 /gateway4mesh/kuma/microservices-demo/
+*.dylib
