@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kong-migrations
+  namespace: kong
+spec:
+  template:
+    metadata:
+      name: kong-migrations
+    spec:
+      containers:
+        - command:
+            - /bin/sh
+            - -c
+            - kong migrations bootstrap
+          env:
+            - name: KONG_PG_PASSWORD
+              value: kong
+            - name: KONG_PG_HOST
+              value: kong-postgresql
+            - name: KONG_PG_PORT
+              value: "5432"
+          image: kong:2.7
+          name: kong-migrations
+      initContainers:
+        - command:
+            - /bin/sh
+            - -c
+            - until nc -zv $KONG_PG_HOST $KONG_PG_PORT -w1; do echo 'waiting for db';
+              sleep 1; done
+          env:
+            - name: KONG_PG_HOST
+              value: kong-postgres
+            - name: KONG_PG_PORT
+              value: "5432"
+          image: busybox
+          name: wait-for-postgres
+      restartPolicy: OnFailure

@@ -1,0 +1,20 @@
+[source,bash]
+.commands.sh
+----
+helm upgrade kong -n kong kong/kong -f values.yaml  #<1> 
+
+helm template kong -n kong kong/kong -f values.yaml | pbcopy  #<2>
+
+#<3> 
+kubectl create configmap my-loadtest-locustfile --from-file=main.py=locustfile.py
+
+helm repo add deliveryhero https://charts.deliveryhero.io/
+helm install locust deliveryhero/locust \
+  --set loadtest.name=my-loadtest \
+  --set loadtest.locust_locustfile_configmap=my-loadtest-locustfile
+
+kubectl --namespace default port-forward service/locust 8089:8089
+----
+<1> upgrade the release with the latest config
+<2> preview manifests before applying
+<3> install locust load testing tool
