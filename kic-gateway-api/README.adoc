@@ -1,0 +1,24 @@
+== commands
+
+[source,bash]
+.commands.sh
+----
+helm repo add kong https://charts.konghq.com
+
+helm repo update
+
+helm install --create-namespace --namespace kong kong kong/kong 
+
+http kongproxy.me
+
+kubectl kustomize "https://github.com/kubernetes-sigs/gateway-api/config/crd?ref=master" | kubectl apply -f -
+
+helm upgrade -n kong kong kong/kong -f kong/values.yaml
+
+cd ./kubernetes
+
+kubectl apply -f 01_gateway.yaml
+kubectl apply -f 02_deployment.yaml
+kubectl apply -f 03_httproute.yaml
+----
+
