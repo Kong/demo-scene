@@ -14,6 +14,8 @@ kubectl patch namespace boutique -p '{"metadata":{"annotations":{"kuma.io/sideca
 export PROJECT_ID=`gcloud config list --format 'value(core.project)'`
 skaffold run --default-repo=gcr.io/$PROJECT_ID
 
+skaffold run -p gcb -n boutique --default-repo=gcr.io/gamovward
+
 # -> show k9s
 
 kumactl install metrics | kubectl apply -f -
