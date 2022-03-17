@@ -17,7 +17,7 @@ TIMESTAMP=$(shell date)
 
 pad=$(printf '%0.1s' "-"{1..80})
 
-KONG_MESH_VERSION ?= 1.4.1
+KONG_MESH_VERSION ?= 1.5.1
 KONG_NAMESPACE ?= kong
 KONG_HELM_RELEASE ?= kong
 DEMO_NAMESPACE ?= boutique
@@ -73,7 +73,7 @@ kong-mesh-policy: check-dependencies
 	
 demo-microservices-install: check-dependencies
 	@echo "${BLUE}𐄳${RESET} 🐻‍❄️ Preparing environment for microservices..."
-	#kubectl create namespace ${DEMO_NAMESPACE}     
+	kubectl create namespace ${DEMO_NAMESPACE}     
 	kubectl patch namespace ${DEMO_NAMESPACE} -p '{"metadata":{"annotations":{"kuma.io/sidecar-injection":"enabled"}}}'
 	@echo ""
 	@echo "☸️  Installing microservices Demo app"
@@ -87,6 +87,7 @@ demo-microservices-install: check-dependencies
 kong-gateway-install: check-dependencies
 	@echo "☸️  Installing Kong 🦍 to ${GREEN}${KONG_NAMESPACE}${RESET} namespace..."
 	kubectl create namespace ${KONG_NAMESPACE}
+	#kubectl patch namespace ${DEMO_NAMESPACE} -p '{"metadata":{"annotations":{"kuma.io/sidecar-injection":"enabled","kuma.io/mesh": "default"}}}'
 	helm repo add kong https://charts.konghq.com && helm repo update
 	helm install -n ${KONG_NAMESPACE} ${KONG_HELM_RELEASE} kong/kong
 	kubectl -n ${KONG_NAMESPACE} wait --for=condition=Available deployment ${KONG_HELM_RELEASE}-kong
@@ -129,7 +130,7 @@ obs-tools-install: check-dependencies
 	kumactl install logging | kubectl apply -f -
 	@echo ""
 
-obs-tools-uninstall-: check-dependencies
+obs-tools-uninstall: check-dependencies
 	@echo "❌ Uninstalling Observability Tools"
 	# $(foreach var,$(OBS_COMPONENTS),"kumactl install $(var) | kubectl delete -f - ";)
 	kumactl install metrics | kubectl delete -f -
