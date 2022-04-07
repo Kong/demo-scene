@@ -1,15 +1,7 @@
 package io.kong.developer.servicereactive;
 
-import com.github.javafaker.Faker;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import io.dekorate.kubernetes.annotation.Env;
 import io.dekorate.kubernetes.annotation.KubernetesApplication;
