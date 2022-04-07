@@ -1,0 +1,22 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: HTTPRoute
+metadata:
+  name: chuck-header
+spec:
+  parentRefs:
+    - name: kong
+  hostnames:
+    - "kongproxy.me"
+  rules:
+    - matches:
+        - headers:
+            - name: quote
+              value: roundhousekick
+              type: Exact
+      backendRefs:
+        - name: chuck-norris-quote-service
+          port: 8080
+        
+            
+          
+        
