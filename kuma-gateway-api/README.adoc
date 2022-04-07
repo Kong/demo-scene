@@ -1,0 +1,39 @@
+== commands
+
+[source,bash]
+.commands.sh
+----
+helm repo add kong https://kumahq.github.io/charts
+
+helm repo update
+
+#!!! TMP pre-release
+
+# in kuma repo clone folder
+CHART=kuma-1.6.0+94f7340e.tgz; gh run download -n $CHART
+mv kuma-1.6.0+94f7340e.tgz ~/projects/kong/demo-scene/kuma-gateway-api/
+
+kubectl kustomize "https://github.com/kubernetes-sigs/gateway-api/config/crd?ref=master" | kubectl apply -f -
+
+
+http kongme.sh
+
+cd ./kubernetes
+
+kubectl apply -f 01_gateway.yaml
+
+echo "apiVersion: v1
+kind: Namespace
+metadata: 
+  name: kuma-demo
+  namespace: kuma-demo
+  annotations: 
+    kuma.io/sidecar-injection: enabled
+    kuma.io/mesh: default" | kubectl apply -f - && kubectl delete pod --all -n kuma-demo
+
+kaf 02_deployment -n kuma-demo
+
+#kubectl apply -f 02_deployment
+#kubectl apply -f 03_httproute.yaml
+----
+

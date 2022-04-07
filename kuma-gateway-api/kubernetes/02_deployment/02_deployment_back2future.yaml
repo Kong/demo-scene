@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.dekorate.io/vcs-url: <<unknown>>
+  labels:
+    app.kubernetes.io/version: latest
+    app.kubernetes.io/name: back2future-quote-service
+  name: back2future-quote-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/version: latest
+      app.kubernetes.io/name: back2future-quote-service
+  template:
+    metadata:
+      annotations:
+        app.dekorate.io/vcs-url: <<unknown>>
+      labels:
+        app.kubernetes.io/version: latest
+        app.kubernetes.io/name: back2future-quote-service
+    spec:
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: QUOTE_SERVICE
+              value: backToFuture
+          image: gamussa/reactive-quote-service:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+          name: back2future-quote-service
+          ports:
+            - containerPort: 8080
+              name: web
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.dekorate.io/vcs-url: <<unknown>>
+  labels:
+    app.kubernetes.io/name: back2future-quote-service
+    app.kubernetes.io/version: latest
+  name: back2future-quote-service
+spec:
+  ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: back2future-quote-service
+    app.kubernetes.io/version: latest
+  type: ClusterIP
