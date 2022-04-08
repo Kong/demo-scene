@@ -2,6 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: HTTPRoute
 metadata:
   name: chuck-header
+  namespace: kuma-demo
 spec:
   parentRefs:
     - group: gateway.networking.k8s.io
