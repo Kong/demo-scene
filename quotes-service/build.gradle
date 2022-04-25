@@ -59,7 +59,7 @@ protobuf {
   // Configure the protoc executable
   protoc {
     // Download from repositories
-    artifact = 'com.google.protobuf:protoc:3.20.0'
+    artifact = 'com.google.protobuf:protoc:3.20.1'
   }
   plugins {
     grpc {
