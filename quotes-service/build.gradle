@@ -28,7 +28,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation "com.github.javafaker:javafaker:1.0.2"
   implementation "io.dekorate:kubernetes-spring-starter:2.9.0"
-  annotationProcessor "io.dekorate:kubernetes-annotations:2.9.0"
+  annotationProcessor "io.dekorate:kubernetes-annotations:2.9.3"
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
