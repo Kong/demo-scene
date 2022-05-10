@@ -5,7 +5,7 @@ metadata:
     app.dekorate.io/vcs-url: <<unknown>>
   labels:
     app.kubernetes.io/name: back2future-quote-service
-    app.kubernetes.io/version: 0.0.4-SNAPSHOT
+    app.kubernetes.io/version: latest
   name: back2future-quote-service
 spec:
   ports:
@@ -14,5 +14,5 @@ spec:
       targetPort: 8080
   selector:
     app.kubernetes.io/name: back2future-quote-service
-    app.kubernetes.io/version: 0.0.4-SNAPSHOT
+    app.kubernetes.io/version: latest
   type: ClusterIP
