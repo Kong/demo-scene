@@ -13,6 +13,6 @@
     "fastify": "^3.21.1"
   },
   "devDependencies": {
-    "prisma": "^3.0.2"
+    "prisma": "^3.12.0"
   }
 }
