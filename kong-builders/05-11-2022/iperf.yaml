@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iperf-server-deployment
+  labels:
+    app: iperf-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iperf-server
+  template:
+    metadata:
+      labels:
+        app: iperf-server
+    spec:
+      containers:
+        - name: iperf3-server
+          image: clearlinux/iperf
+          args: [ '--server' ]
+          ports:
+            - containerPort: 5201
+              name: server
+      terminationGracePeriodSeconds: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iperf-server
+spec:
+  selector:
+    app: iperf-server
+  ports:
+    - protocol: TCP
+      port: 5201
+      targetPort: server
+      name: tcp
+---
+apiVersion: configuration.konghq.com/v1beta1
+kind: TCPIngress
+metadata:
+  name: iperf-tcp-ingress
+  annotations:
+    kubernetes.io/ingress.class: kong
+spec:
+  rules:
+    - port: 9000
+      backend:
+        serviceName: iperf-server
+        servicePort: 5201

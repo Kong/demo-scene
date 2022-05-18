@@ -1,0 +1,25 @@
+proxy:
+  stream:
+    # Set the container (internal) and service (external) ports for this listen.
+    # These values should normally be the same. If your environment requires they
+    # differ, note that Kong will match routes based on the containerPort only.
+    - containerPort: 9000
+      servicePort: 9000
+      protocol: TCP
+      # Optionally set a static nodePort if the service type is NodePort
+      # nodePort: 32080
+      # Additional listen parameters, e.g. "ssl", "reuseport", "backlog=16384"
+      # "ssl" is required for SNI-based routes. It is not supported on versions <2.0
+  #   parameters: []
+# -----------------------------------------------------------------------------
+# UDP Proxy
+# -----------------------------------------------------------------------------
+udpProxy:
+  # Enable creating a Kubernetes service for UDP proxying
+  enabled: true
+  
+  stream:
+    - containerPort: 9999
+      servicePort: 9999
+      protocol: UDP
+  parameters: [ "reuseport" ]
