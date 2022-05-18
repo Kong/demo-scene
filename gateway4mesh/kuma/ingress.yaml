@@ -4,17 +4,17 @@ metadata:
   annotations:
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    external-dns.alpha.kubernetes.io/hostname: shop.kongproxy.me
+    external-dns.alpha.kubernetes.io/hostname: shop.kongme.sh
   name: frontend
   namespace: boutique
 spec:
   ingressClassName: kong
   tls:
-    - secretName: shop-kongproxy-me
+    - secretName: shop-kongme-sh
       hosts:
-        - shop.kongproxy.me
+        - shop.kongme.sh
   rules:
-    - host: shop.kongproxy.me
+    - host: shop.kongme.sh
       http:
         paths:
           - path: /
