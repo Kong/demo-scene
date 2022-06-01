@@ -1,6 +1,6 @@
 package io.kong.developer.servicereactive.common;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

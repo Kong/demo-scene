@@ -1,12 +1,12 @@
 plugins {
-  id 'org.springframework.boot' version '2.6.6'
+  id 'org.springframework.boot' version '2.7.0'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'java'
   id 'idea'
   //id 'org.springframework.experimental.aot' version '0.10.5'
   id 'net.researchgate.release' version '2.8.1'
   id 'com.google.protobuf' version '0.8.18'
-  id 'com.gorylenko.gradle-git-properties' version '2.4.0'
+  id 'com.gorylenko.gradle-git-properties' version '2.4.1'
 }
 
 group = 'io.kong.developer'
@@ -26,17 +26,17 @@ repositories {
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-webflux'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
-  implementation "com.github.javafaker:javafaker:1.0.2"
-  implementation "io.dekorate:kubernetes-spring-starter:2.9.0"
-  annotationProcessor "io.dekorate:kubernetes-annotations:2.9.0"
+  implementation "net.datafaker:datafaker:1.4.0"
+  implementation 'io.dekorate:kubernetes-spring-starter:2.9.3'
+  annotationProcessor 'io.dekorate:kubernetes-annotations:2.9.3'
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
 
   //grpc stuff
   implementation 'net.devh:grpc-server-spring-boot-starter:2.13.1.RELEASE'
-  implementation "com.google.protobuf:protobuf-java:3.20.0"
-  implementation "io.grpc:grpc-stub:1.45.1"
+  implementation 'com.google.protobuf:protobuf-java:3.21.1'
+  implementation 'io.grpc:grpc-stub:1.46.0'
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'io.projectreactor:reactor-test'
@@ -59,11 +59,11 @@ protobuf {
   // Configure the protoc executable
   protoc {
     // Download from repositories
-    artifact = 'com.google.protobuf:protoc:3.20.0'
+    artifact = 'com.google.protobuf:protoc:3.21.1'
   }
   plugins {
     grpc {
-      artifact = 'io.grpc:protoc-gen-grpc-java:1.45.1'
+      artifact = 'io.grpc:protoc-gen-grpc-java:1.46.0'
     }
   }
   generateProtoTasks {

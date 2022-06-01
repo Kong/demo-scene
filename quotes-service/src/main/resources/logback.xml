@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="NICE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>
+                %yellow(%d{yyyy-MM-dd HH:mm:ss}) %highlight([%p]) %magenta((%file:%line\)) - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="NICE"/>
+    </root>
+
+    <logger name="io.kong.developer.servicereactive.grpc" level="DEBUG"/>
+
+</configuration>

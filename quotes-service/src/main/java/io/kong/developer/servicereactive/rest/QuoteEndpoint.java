@@ -24,13 +24,6 @@ class QuoteEndpoint {
   @SneakyThrows
   @GetMapping(value = "/", produces = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<Response> hello() {
-    final Response response = new Response(quoteService.getFakeQuote());
-    
-    HttpHeaders httpHeaders = new HttpHeaders();
-    final Optional<String> hostname = Optional.ofNullable(System.getenv("HOSTNAME"));
-    final Optional<String> podNamespace = Optional.ofNullable(System.getenv("KUBERNETES_NAMESPACE"));
-    httpHeaders.add("X-Pod-Name", hostname.orElse(String.valueOf(InetAddress.getLocalHost())));
-    httpHeaders.add("X-Pod-Namespace", podNamespace.orElse("UNKNOWN"));
-    return new ResponseEntity<>(response, httpHeaders, HttpStatus.OK);
+    return new ResponseEntity<>(new Response(quoteService.getFakeQuote()), HttpStatus.OK);
   }
 }

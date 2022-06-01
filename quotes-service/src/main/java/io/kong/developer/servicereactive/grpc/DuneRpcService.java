@@ -2,8 +2,7 @@ package io.kong.developer.servicereactive.grpc;
 
 import com.google.protobuf.Empty;
 
-import com.github.javafaker.Faker;
-
+import net.datafaker.Faker;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.stream.Stream;
