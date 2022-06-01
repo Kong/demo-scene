@@ -4,21 +4,21 @@ metadata:
   annotations:
     app.dekorate.io/vcs-url: <<unknown>>
   labels:
-    app.kubernetes.io/version: 0.0.4-SNAPSHOT
+    app.kubernetes.io/version: latest
     app.kubernetes.io/name: back2future-quote-service
   name: back2future-quote-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/version: 0.0.4-SNAPSHOT
+      app.kubernetes.io/version: latest
       app.kubernetes.io/name: back2future-quote-service
   template:
     metadata:
       annotations:
         app.dekorate.io/vcs-url: <<unknown>>
       labels:
-        app.kubernetes.io/version: 0.0.4-SNAPSHOT
+        app.kubernetes.io/version: latest
         app.kubernetes.io/name: back2future-quote-service
     spec:
       containers:
@@ -29,7 +29,7 @@ spec:
                   fieldPath: metadata.namespace
             - name: QUOTE_SERVICE
               value: backToFuture
-          image: gamussa/reactive-quote-service:0.0.4-SNAPSHOT
+          image: gamussa/reactive-quote-service:latest
           imagePullPolicy: IfNotPresent
           name: back2future-quote-service
           ports:

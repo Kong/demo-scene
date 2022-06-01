@@ -2,10 +2,14 @@ version: "3.9"
 
 services:
   db:
-    image: mysql:5.7
+    # use image 👇 when running x86 docker
+    #image: mysql:5.7
+    image: arm64v8/mysql:oracle
     volumes:
       - db_data:/var/lib/mysql
     restart: always
+    ports:
+      - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: supersecure
       MYSQL_DATABASE: summit
@@ -19,5 +23,8 @@ services:
     ports:
       - "3000:3000"
     restart: always
+    # TODO: use `evensubstr` and don't hardcode
+    environment:
+      - DATABASE_URL=mysql://summit:summit@db:3306/summit
 volumes:
-  db_data: {}
+  db_data: { }
