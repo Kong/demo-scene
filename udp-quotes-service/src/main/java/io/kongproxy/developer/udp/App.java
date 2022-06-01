@@ -1,28 +1,27 @@
 
 package io.kongproxy.developer.udp;
 
-import com.github.javafaker.Faker;
-import com.github.javafaker.RickAndMorty;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+
+import net.datafaker.Faker;
+import net.datafaker.RickAndMorty;
 
 import org.reactivestreams.Publisher;
 
 import java.time.Duration;
 import java.util.function.BiFunction;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 import reactor.netty.Connection;
 import reactor.netty.udp.UdpInbound;
 import reactor.netty.udp.UdpOutbound;
 import reactor.netty.udp.UdpServer;
 
-import static reactor.core.publisher.Mono.*;
+import static reactor.core.publisher.Mono.error;
 
 @Slf4j
 public class App {
