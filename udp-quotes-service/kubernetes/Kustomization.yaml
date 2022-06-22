@@ -1,0 +1,5 @@
+resources:
+  - 00_namespace.yaml
+  - 01_deployment.yaml
+  - 02_service.yaml
+  - 03_udpingress.yaml

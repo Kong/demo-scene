@@ -5,7 +5,7 @@ metadata:
   annotations:
     konghq.com/strip-path: "true"
     external-dns.alpha.kubernetes.io/hostname: chuck.kongproxy.me
-    konghq.com/plugins: user1-auth,rate-paid-tier,platinum-paid-tier
+    #konghq.com/plugins: user1-auth,rate-paid-tier,platinum-paid-tier
 spec:
   ingressClassName: kong
   rules:
