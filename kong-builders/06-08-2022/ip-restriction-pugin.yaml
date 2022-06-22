@@ -1,0 +1,12 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongClusterPlugin
+metadata:
+  name: global-ip-restriction
+  annotations:
+    kubernetes.io/ingress.class: kong
+  labels:
+    global: "true"
+config:
+  allow:
+    - 98.242.221.99
+plugin: ip-restriction

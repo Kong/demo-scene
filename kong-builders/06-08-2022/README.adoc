@@ -1,0 +1,8 @@
+== Kong Builder, episode 06-06-2022
+
+=== Plugins
+
+* https://docs.konghq.com/hub/kong-inc/prometheus/[Prometheus plugin (metrics setup)]
+* https://docs.konghq.com/hub/kong-inc/proxy-cache/[Proxy Caching Plugin]
+* https://docs.konghq.com/hub/kong-inc/bot-detection/[Bot Detection]
+* https://docs.konghq.com/hub/kong-inc/ip-restriction/[IP Restriction]

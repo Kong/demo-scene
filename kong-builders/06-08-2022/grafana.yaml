@@ -1,0 +1,30 @@
+persistence:
+  enabled: true  # enable persistence using Persistent Volumes
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources: # configure Grafana to read metrics from Prometheus
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-server # Since Prometheus is deployed in
+        access: proxy    # the same namespace, this resolves
+        # to the Prometheus Server we just installed
+        isDefault: true  # The default data source is Prometheus
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: 'default' # Configure a dashboard provider file to
+        orgId: 1        # put the Kong dashboard into.
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+dashboards:
+  default:
+    kong-dash:
+      gnetId: 7424  # Install the following Grafana dashboard in the
+      revision: 7   # instance: https://grafana.com/dashboards/7424
+      datasource: Prometheus
