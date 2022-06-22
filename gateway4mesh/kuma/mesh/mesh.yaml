@@ -1,0 +1,37 @@
+apiVersion: kuma.io/v1alpha1
+kind: Mesh
+metadata:
+  name: default
+#spec:
+#  mtls:
+#    enabledBackend: ca-1
+#    backends:
+#      - name: ca-1
+#        type: builtin
+#        dpCert:
+#          rotation:
+#            expiration: 1d
+#        conf:
+#          caCert:
+#            RSAbits: 2048
+#            expiration: 10y
+#  logging:
+#    defaultBackend: loki
+#    backends:
+#      - name: loki
+#        type: file
+#        conf:
+#          path: /dev/stdout
+#  metrics:
+#    enabledBackend: prometheus-1
+#    backends:
+#      - name: prometheus-1
+#        type: prometheus
+#  tracing:
+#    defaultBackend: jaeger-collector
+#    backends:
+#      - name: jaeger-collector
+#        type: zipkin
+#        sampling: 100.0
+#        conf:
+#          url: http://jaeger-collector.mesh-observabilitymesh-observability:9411/api/v2/spans

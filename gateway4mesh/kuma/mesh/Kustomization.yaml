@@ -1,0 +1,4 @@
+resources:
+  - mesh.yaml
+  - trafficLog-all-traffic.yaml
+  - trafficTrace-trace-all.yaml

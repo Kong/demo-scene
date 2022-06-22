@@ -11,8 +11,9 @@ kubectl create namespace boutique
 #kubens
 kubectl patch namespace boutique -p '{"metadata":{"annotations":{"kuma.io/sidecar-injection":"enabled"}}}'
 
-export PROJECT_ID=`gcloud config list --format 'value(core.project)'`
-skaffold run --default-repo=gcr.io/$PROJECT_ID
+PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+export PROJECT_ID
+skaffold run --default-repo=gcr.io/"$PROJECT_ID"
 
 skaffold run -p gcb -n boutique --default-repo=gcr.io/gamovward
 

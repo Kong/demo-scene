@@ -1,0 +1,14 @@
+apiVersion: kuma.io/v1alpha1
+kind: TrafficLog
+metadata:
+  name: all-traffic
+mesh: default
+spec:
+  # This TrafficLog policy applies all traffic in that Mesh.
+  sources:
+    - match:
+        kuma.io/service: '*'
+  destinations:
+    - match:
+        kuma.io/service: '*'
+  # When `backend ` field is omitted, the logs will be forwarded into the `defaultBackend` of that Mesh.
