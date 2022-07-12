@@ -13,8 +13,7 @@ helm repo update
 CHART=kuma-1.6.0+94f7340e.tgz; gh run download -n $CHART
 mv kuma-1.6.0+94f7340e.tgz ~/projects/kong/demo-scene/kuma-gateway-api/
 
-kubectl kustomize "https://github.com/kubernetes-sigs/gateway-api/config/crd?ref=master" | kubectl apply -f -
-
+kubectl apply -k "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.3"
 
 http kongme.sh
 

@@ -12,7 +12,8 @@ spec:
     - "back2future.kongme.sh"
   rules:
     - backendRefs:
-        - name: back2future-quote-service
-          port: 8080
+        - group: ''
           kind: Service
+          name: back2future-quote-service
+          port: 8080
           weight: 1

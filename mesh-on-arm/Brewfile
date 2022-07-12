@@ -1,0 +1,3 @@
+brew "awscli"
+brew "eksctl"
+brew "saml2aws"

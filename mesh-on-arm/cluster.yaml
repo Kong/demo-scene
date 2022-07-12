@@ -1,0 +1,24 @@
+# nonk8s
+# A simple example of ClusterConfig object:
+# https://github.com/weaveworks/eksctl/blob/main/examples/01-simple-cluster.yaml
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: armed-mesh
+  region: us-east-1
+  tags: 
+    owner: vikgamov
+
+nodeGroups:
+  - name: mng-arm0
+    # ref https://aws.amazon.com/ec2/instance-types/m6g/
+    instanceType: m6g.xlarge
+    desiredCapacity: 3
+cloudWatch:
+  clusterLogging:
+    # enable specific types of cluster control plane logs
+    enableTypes: ["audit", "authenticator", "controllerManager"]
+    # all supported types: "api", "audit", "authenticator", "controllerManager", "scheduler"
+    # supported special values: "*" and "all"# A simple example of ClusterConfig object:

@@ -1,0 +1,28 @@
+== Prerequisites
+
+* awscli `brew install awscli`
+* ekscli `brew install ekscli`
+* saml2aws `brew install saml2aws`
+
+Run `make brew-install-dependencies` to install all required prerequisite tools.
+
+== references
+
+* https://aws.amazon.com/ec2/instance-types/m6g/[Graviton instance types]
+* https://aws.amazon.com/blogs/containers/eks-on-graviton-generally-available/[FYI: Graviton 2 announcement blog]
+* https://eksctl.io/usage/minimum-iam-policies/[minimum aws permissions]
+
+== cluster setup
+
+[source,bash]
+.Cluster setup
+----
+make eks-cluster-create #<1>
+make eks-cluster-delete #<2>
+make make mesh-delete-cp  #<3>
+----
+<1> creates EKS cluster based on `cluster.yaml` spec.
+<2> destroy EKS cluster.
+<3> Install Kong Mesh control plane.
+
+
