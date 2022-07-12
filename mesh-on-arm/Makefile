@@ -36,7 +36,7 @@ mesh-install-cp: mesh-install-gateway-crds
        --set kuma.controlPlane.secrets[0].Env="KMESH_LICENSE_INLINE" \
        --set kuma.controlPlane.secrets[0].Secret="kong-mesh-license" \
        --set kuma.controlPlane.secrets[0].Key="license.json" \
-       --set experimental.gatewayAPI=true
+       --set kuma.experimental.gatewayAPI=true
 	@echo ""
 
 mesh-delete-cp: check-dependencies
