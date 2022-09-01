@@ -171,3 +171,4 @@ kuma-*.tgz
 /mesh-on-arm/Brewfile.lock.json
 /mesh-on-arm/app/blog/api/node_modules/
 node_modules/
+/kong-builders/31-08-2022/kong-builders-go-plugin/bin/

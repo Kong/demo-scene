@@ -1,0 +1,17 @@
+= Kong Builders 31/08/2022 Hackathon Edition
+Viktor Gamov <viktor@konghq.com>
+v1.0, 2022-09-01
+:toc:
+
+== Prerequisite
+
+* GO SDK installed
+* Watch https://youtu.be/DVML-bT0_Wc[Kong Builders stream recording]
+
+== Build and Run
+
+[source,bash]
+.run.sh
+----
+make && docker-compose-up
+----
