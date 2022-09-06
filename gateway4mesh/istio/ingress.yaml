@@ -3,8 +3,19 @@ kind: Ingress
 metadata:
   name: productpage
   namespace: bookinfo
+  annotations:
+    #konghq.com/plugins: rate-free-tier
+    #konghq.com/plugins: user1-auth,rate-paid-tier
+    #konghq.com/plugins: user1-auth,rate-paid-tier,platinum-paid-tier
+    external-dns.alpha.kubernetes.io/hostname: istio.kongproxy.me
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: kong
+  tls:
+    - secretName: istio-kongproxy-me
+      hosts:
+        - istio.kongproxy.me
   rules:
     - http:
         paths:

@@ -1,0 +1,25 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: user1-auth
+plugin: key-auth
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: user1
+  annotations:
+    kubernetes.io/ingress.class: kong
+username: user1
+credentials:
+  - user1-apikey    
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: rate-paid-tier
+config:
+  minute: 10
+  limit_by: consumer
+  policy: local
+plugin: rate-limiting
