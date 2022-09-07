@@ -25,10 +25,13 @@ func main() {
 func (c Config) Access(kong *pdk.PDK) {
 	userAgent, _ := kong.Request.GetHeader("user-agent")
 	log.Printf("Got request from %s", userAgent)
+	service, _ := kong.Router.GetService()
 
 	if c.Attach {
 		if strings.Contains(userAgent, "Kong Builders") {
-			kong.Response.SetHeader("X-Kong-Builders", "Welcome to the jungle 🌴")
+			kong.Response.SetHeader("X-Kong-Builders-Name", service.Name)
+			kong.Response.SetHeader("X-Kong-Builders-Host", service.Host)
+			kong.Response.SetHeader("X-Kong-Builders-Protocol", service.Protocol)
 		}
 	}
 }
