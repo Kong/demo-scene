@@ -1,0 +1,14 @@
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: chat-out-trigger
+spec:
+  broker: default
+  filter:
+    attributes:
+      type: text-filtered
+  subscriber:
+    ref:
+      apiVersion: eventing.knative.dev/v1alpha1
+      kind: KafkaSink
+      name: my-kafka-sink

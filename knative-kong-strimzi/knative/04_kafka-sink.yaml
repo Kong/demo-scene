@@ -1,0 +1,9 @@
+apiVersion: eventing.knative.dev/v1alpha1
+kind: KafkaSink
+metadata:
+  name: my-kafka-sink
+spec:
+  topic: chat_out
+  bootstrapServers:
+    - my-cluster-kafka-bootstrap.kafka:9092
+  contentMode: binary
