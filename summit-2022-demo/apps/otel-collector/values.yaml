@@ -1,0 +1,281 @@
+mode: deployment
+
+presets:
+  # Configures the collector to collect logs.
+  # Adds the filelog receiver to the logs pipeline
+  # and adds the necessary volumes and volume mounts.
+  # Best used with mode = daemonset.
+  logsCollection:
+    enabled: false
+    includeCollectorLogs: false
+  # Configures the collector to collect host metrics.
+  # Adds the hostmetrics receiver to the metrics pipeline
+  # and adds the necessary volumes and volume mounts.
+  # Best used with mode = daemonset.
+  hostMetrics:
+    enabled: false
+
+configMap:
+  # Specifies whether a configMap should be created (true by default)
+  create: true
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        http:
+          endpoint: 0.0.0.0:4318
+  exporters:
+    datadog:
+      api:
+        key: "DATADOG_API_KEY"
+  service:
+    pipelines:
+      traces:
+        receivers:
+          - otlp
+        exporters:
+          - datadog
+
+image:
+  # If you want to use the core image `otel/opentelemetry-collector`, you also need to change `command.name` value to `otelcol`.
+  repository: otel/opentelemetry-collector-contrib
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+imagePullSecrets: []
+
+# OpenTelemetry Collector executable
+command:
+  name: otelcol-contrib
+  extraArgs: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+clusterRole:
+  # Specifies whether a clusterRole should be created
+  create: false
+  # Annotations to add to the clusterRole
+  annotations: {}
+  # The name of the clusterRole to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  # A set of rules as documented here : https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  rules: []
+  # - apiGroups:
+  #   - ''
+  #   resources:
+  #   - 'pods'
+  #   - 'nodes'
+  #   verbs:
+  #   - 'get'
+  #   - 'list'
+  #   - 'watch'
+
+  clusterRoleBinding:
+    # Annotations to add to the clusterRoleBinding
+    annotations: {}
+    # The name of the clusterRoleBinding to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+podSecurityContext: {}
+securityContext: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Allows for pod scheduler prioritisation
+priorityClassName: ""
+
+extraEnvs: []
+extraVolumes: []
+extraVolumeMounts: []
+
+# Configuration for ports
+ports:
+  otlp:
+    enabled: true
+    containerPort: 4317
+    servicePort: 4317
+    hostPort: 4317
+    protocol: TCP
+  otlp-http:
+    enabled: true
+    containerPort: 4318
+    servicePort: 4318
+    hostPort: 4318
+    protocol: TCP
+  jaeger-compact:
+    enabled: true
+    containerPort: 6831
+    servicePort: 6831
+    hostPort: 6831
+    protocol: UDP
+  jaeger-thrift:
+    enabled: true
+    containerPort: 14268
+    servicePort: 14268
+    hostPort: 14268
+    protocol: TCP
+  jaeger-grpc:
+    enabled: true
+    containerPort: 14250
+    servicePort: 14250
+    hostPort: 14250
+    protocol: TCP
+  zipkin:
+    enabled: true
+    containerPort: 9411
+    servicePort: 9411
+    hostPort: 9411
+    protocol: TCP
+  metrics:
+    # The metrics port is disabled by default. However you need to enable the port
+    # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
+    enabled: false
+    containerPort: 8888
+    servicePort: 8888
+    protocol: TCP
+
+# Resource limits & requests. Update according to your own use case as these values might be too low for a typical deployment.
+resources:
+  limits:
+    cpu: 256m
+    memory: 512Mi
+
+podAnnotations: {}
+
+podLabels: {}
+
+# Host networking requested for this pod. Use the host's network namespace.
+hostNetwork: false
+
+# Pod DNS policy ClusterFirst, ClusterFirstWithHostNet, None, Default, None
+dnsPolicy: ""
+
+# only used with deployment mode
+replicaCount: 1
+
+annotations: {}
+
+# List of init container specs, e.g. for copying a binary to be executed as a lifecycle hook.
+initContainers: []
+# initContainers:
+#   - name: test
+#     command:
+#       - cp
+#     args:
+#       - /bin/sleep
+#       - /test/sleep
+#     image: busybox:latest
+#     volumeMounts:
+#       - name: test
+#         mountPath: /test
+
+# Pod lifecycle policies.
+lifecycleHooks: {}
+# lifecycleHooks:
+#   preStop:
+#     exec:
+#       command:
+#       - /test/sleep
+#       - "5"
+
+service:
+  type: ClusterIP
+  annotations: {}
+
+ingress:
+  enabled: false
+  # annotations: {}
+  # ingressClassName: nginx
+  # hosts:
+  #   - host: collector.example.com
+  #     paths:
+  #       - path: /
+  #         pathType: Prefix
+  #         port: 4318
+  # tls:
+  #   - secretName: collector-tls
+  #     hosts:
+  #       - collector.example.com
+
+  # Additional ingresses - only created if ingress.enabled is true
+  # Useful for when differently annotated ingress services are required
+  # Each additional ingress needs key "name" set to something unique
+  additionalIngresses: []
+  # - name: cloudwatch
+  #   ingressClassName: nginx
+  #   annotations: {}
+  #   hosts:
+  #     - host: collector.example.com
+  #       paths:
+  #         - path: /
+  #           pathType: Prefix
+  #           port: 4318
+  #   tls:
+  #     - secretName: collector-tls
+  #       hosts:
+  #         - collector.example.com
+
+podMonitor:
+  # The pod monitor by default scrapes the metrics port.
+  # The metrics port needs to be enabled as well.
+  enabled: false
+  metricsEndpoints:
+    - port: metrics
+      # interval: 15s
+
+  # additional labels for the PodMonitor
+  extraLabels: {}
+  #   release: kube-prometheus-stack
+
+serviceMonitor:
+  # The service monitor by default scrapes the metrics port.
+  # The metrics port needs to be enabled as well.
+  enabled: false
+  metricsEndpoints:
+    - port: metrics
+      # interval: 15s
+
+  # additional labels for the ServiceMonitor
+  extraLabels: {}
+  #  release: kube-prometheus-stack
+
+# PodDisruptionBudget is used only if deployment enabled
+podDisruptionBudget:
+  enabled: false
+#   minAvailable: 2
+#   maxUnavailable: 1
+
+# autoscaling is used only if deployment enabled
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+prometheusRule:
+  enabled: false
+  groups: []
+  # Create default rules for monitoring the collector
+  defaultRules:
+    enabled: false
+
+  # additional labels for the PrometheusRule
+  extraLabels: {}
+
+statefulset:
+  # volumeClaimTemplates for a statefulset
+  volumeClaimTemplates: []
+  podManagementPolicy: "Parallel"

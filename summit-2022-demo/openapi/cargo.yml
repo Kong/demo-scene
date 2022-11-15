@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+  title: Cargo Service
+  version: "2.0"
+  license:
+    name: MIT
+  contact:
+    email: airways@konghq.com
+  description: Keep track of where cargo is at all times
+servers:
+  - url: "https://api.kongairways.com/cargo/v2"
+paths:
+  /commercial:
+    get:
+      operationId: list-cargo
+      summary: List Cargo
+      description: |
+        This endpoint returns a list of all cargo that is currently registered with Kong Airways.
+
+        Once a package has been delivered to it's final destination, it will no longer be returned by this endpoint.
+      tags:
+        - cargo
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - CLEARED
+              - HELD
+              - PENDING
+          in: query
+          name: status
+          description: Only show cargo with the provided customs status
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                uniqueItems: true
+                items:
+                  $ref: "#/components/schemas/Cargo"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalid-sentiment:
+                  value:
+                    type: "https://docs.kongairways.com/problem/cargo/invalid-status"
+                    title: Invalid status provided
+                    detail: "[all] is an invalid value. Possible values: [CLEARED, HELD, PENDING]"
+                    instance: "t:beQpT0Hn"
+
+components:
+  schemas:
+    Cargo:
+      type: object
+      properties:
+        waybill_number:
+          type: string
+          example: KA981
+        customs_status:
+          type: object
+          properties:
+            status_code:
+              type: string
+              example: CLEARED
+            destination_airport:
+              type: string
+              example: MIA
+            origin_airport:
+              type: string
+              example: LHR
+            updated_at:
+              type: string
+              example: 2022-09-23:23:14:28Z
+        destination:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Roger Pfannerstill Jr.
+            street:
+              type: string
+              example: "8378 Mertz Square"
+            city:
+              type: string
+              example: Fort Modesta
+            zip_code:
+              type: string
+              example: "91415"
+            country:
+              type: string
+              example: USA
+        sender:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Jane Doe
+            street:
+              type: string
+              example: "92 Acacia Avenue"
+            city:
+              type: string
+              example: Underlondon
+            zip_code:
+              type: string
+              example: "L7 AKD"
+            country:
+              type: string
+              example: GB
+    Error:
+      description: "An RFC7807 formatted error"
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+      required:
+        - type
+        - title
+        - instance
+
+tags:
+  - name: cargo
+    description: Endpoints related to creating, monitoring and archiving cargo

@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+  title: Feedback Service
+  version: "1.0"
+  license:
+    name: MIT
+  contact:
+    email: airways@konghq.com
+  description: Flight feedback API
+servers:
+  - url: "https://api.kongairways.com"
+paths:
+  /feedback:
+    get:
+      operationId: list-feedback
+      summary: List all available feedback
+      description: List all feedback
+      tags:
+        - feedback
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - positive
+              - negative
+              - neutral
+          in: query
+          name: sentiment
+          description: Only show feedback that match the provided `sentiment`
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: "List of feedback matching the provided filters"
+                uniqueItems: true
+                items:
+                  $ref: "#/components/schemas/Feedback"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalid-sentiment:
+                  value:
+                    type: "https://docs.kongairways.com/problem/invalid-sentiment"
+                    title: Invalid sentiment provided
+                    detail: "[all] is an invalid value. Possible values: [positive, negative, neutral]"
+                    instance: "t:beQpT0Hn"
+    post:
+      operationId: add-feedback
+      summary: Create feedback
+      description: Add a new feedback item
+      tags:
+        - feedback
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackCreate"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feedback"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalid-sentiment:
+                  value:
+                    type: "https://docs.kongairways.com/problem/invalid-feedback"
+                    title: Missing Parameter
+                    detail: "The [flight_number] parameter is missing"
+                    instance: "t:kS92j7H"
+
+components:
+  schemas:
+    FeedbackCreate:
+      type: object
+      properties:
+        flight_number:
+          type: string
+          example: KA981
+        flight_date:
+          type: string
+          example: 2022-09-25
+        sentiment:
+          type: string
+          example: positive
+        text:
+          type: string
+          example: |
+            Thank you to Charlie in the main cabin who went above and beyond when I realised I hadn't
+            submitted my dietary requirements on time. They found me something to eat and made me feel
+            like it wasn't an issue at all.
+    Feedback:
+      allOf:
+        - $ref: "#/components/schemas/FeedbackCreate"
+        - type: object
+          properties:
+            created_at:
+              type: string
+              example: 2022-09-26T08:33:12Z
+    Error:
+      description: "An RFC7807 formatted error"
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+      required:
+        - type
+        - title
+        - instance
+
+tags:
+  - name: feedback
+    description: This will be filled out later
