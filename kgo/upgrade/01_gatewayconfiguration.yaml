@@ -1,0 +1,9 @@
+kind: GatewayConfiguration
+apiVersion: gateway-operator.konghq.com/v1alpha1
+metadata:
+  name: kong
+  namespace: default
+spec:
+  dataPlaneDeploymentOptions:
+    containerImage: kong/kong-gateway
+    version: "3.0"
