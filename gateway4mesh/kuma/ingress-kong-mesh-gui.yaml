@@ -4,23 +4,23 @@ metadata:
   annotations:
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    external-dns.alpha.kubernetes.io/hostname: shop.kong.builders
-  name: frontend
-  namespace: boutique
+    external-dns.alpha.kubernetes.io/hostname: gui.kong.builders
+  name: km-gui
+  namespace: kong-mesh-system
 spec:
   ingressClassName: kong
   tls:
-    - secretName: shop-kong-builders
+    - secretName: gui-kong-builders
       hosts:
-        - shop.kong.builders
+        - gui.kong.builders
   rules:
-    - host: shop.kong.builders
+    - host: gui.kong.builders
       http:
         paths:
           - path: /
             pathType: ImplementationSpecific
             backend:
               service:
-                name: frontend
+                name: kong-mesh-control-plane
                 port:
-                  number: 80
+                  number: 5681

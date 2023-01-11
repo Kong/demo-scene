@@ -18,7 +18,7 @@ TIMESTAMP=$(shell date)
 pad=$(printf '%0.1s' "-"{1..80})
 
 
-KONG_MESH_VERSION ?= 1.8.0
+KONG_MESH_VERSION ?= 2.0.0
 KONG_NAMESPACE ?= kong
 KONG_HELM_RELEASE ?= kong
 DEMO_NAMESPACE ?= boutique
@@ -69,8 +69,13 @@ kong-mesh-validate: check-dependencies
 kong-mesh-cp-ui-pf: check-dependencies
 	kubectl port-forward svc/kong-mesh-control-plane -n kong-mesh-system 5681:5681 
 
+kong-mesh-observability-ui: check-dependencies
+	kubectl port-forward svc/grafana -n mesh-observability 3000:3000 
+
 kong-mesh-policy: check-dependencies
-	kubectl apply -f mesh.yaml
+	kubectl apply -f ./mesh/mesh.yaml
+	#kubectl apply -k ./mesh
+
 	
 demo-microservices-install: check-dependencies
 	@echo "${BLUE}𐄳${RESET} 🐻‍❄️ Preparing environment for microservices..."

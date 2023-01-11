@@ -1,0 +1,23 @@
+apiVersion: kuma.io/v1alpha1
+kind: RateLimit
+mesh: default
+metadata:
+  name: rate-limit-all-to-currency
+spec:
+  sources:
+    - match:
+        kuma.io/service: "*"
+  destinations:
+    - match:
+        kuma.io/service: currencyservice_boutique_svc_7000
+        kuma.io/protocol: grpc
+  conf:
+    http:
+      requests: 5
+      interval: 10s
+      onRateLimit:
+        status: 423
+        headers:
+          - key: "x-kuma-rate-limited"
+            value: "true"
+            append: true

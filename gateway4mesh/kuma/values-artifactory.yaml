@@ -1,0 +1,10 @@
+kuma:
+  controlPlane:
+    secrets:
+      - Env: KMESH_LICENSE_INLINE
+        Key: license.json
+        Secret: kong-mesh-license
+  global:
+    image:
+      registry: "vikgamov.jfrog.io/default-docker/kong"
+    imagePullSecrets: ["regcred"]

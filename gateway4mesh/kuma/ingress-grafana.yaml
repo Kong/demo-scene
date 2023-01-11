@@ -4,23 +4,23 @@ metadata:
   annotations:
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    external-dns.alpha.kubernetes.io/hostname: shop.kong.builders
-  name: frontend
-  namespace: boutique
+    external-dns.alpha.kubernetes.io/hostname: grafana.kong.builders
+  name: grafana
+  namespace: mesh-observability
 spec:
   ingressClassName: kong
   tls:
-    - secretName: shop-kong-builders
+    - secretName: grafana-kong-builders
       hosts:
-        - shop.kong.builders
+        - grafana.kong.builders
   rules:
-    - host: shop.kong.builders
+    - host: grafana.kong.builders
       http:
         paths:
           - path: /
             pathType: ImplementationSpecific
             backend:
               service:
-                name: frontend
+                name: grafana
                 port:
                   number: 80

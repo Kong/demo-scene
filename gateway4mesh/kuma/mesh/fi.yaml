@@ -1,0 +1,23 @@
+apiVersion: kuma.io/v1alpha1
+kind: FaultInjection
+mesh: default
+metadata:
+  name: break-frontend-productcatalog
+spec:
+  sources:
+    - match:
+        kuma.io/service: frontend_boutique_svc_80
+  destinations:
+    - match:
+        kuma.io/service: productcatalogservice_boutique_svc_3550
+        kuma.io/protocol: grpc
+  conf:
+    abort:
+      httpStatus: 500
+      percentage: 50
+    delay:
+      percentage: 50.5
+      value: 5s
+    responseBandwidth:
+      limit: 50 mbps
+      percentage: 50 
