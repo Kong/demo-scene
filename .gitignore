@@ -172,3 +172,5 @@ kuma-*.tgz
 /mesh-on-arm/app/blog/api/node_modules/
 node_modules/
 /kong-builders/08-31-2022/kong-builders-go-plugin/bin/
+kong-quickstart.env
+kong.env

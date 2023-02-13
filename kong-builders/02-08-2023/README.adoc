@@ -1,0 +1,17 @@
+
+== how-to
+
+- start kong with `quickstart` script
+- enable service `wow` and route
+
+== links
+
+- https://docs.konghq.com/gateway/latest/get-started/ 
+- https://opentelemetry.io/ 
+- https://docs.konghq.com/hub/kong-inc/opentelemetry/
+- https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter/?tab=dockerlocalhost
+- https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/datadogexporter/examples/collector.yaml
+- https://docs.konghq.com/gateway/latest/plugin-development/custom-logic/[Documentation - About Kong Request Phases]
+- https://youtu.be/gnX_uBh0KOc[Kong Request Phases, part 1]
+- https://youtu.be/1sBui6Z0IDc[Kong Request Phases, part 2]
+- https://docs.konghq.com/gateway/latest/production/tracing/#core-instrumentations
