@@ -1,0 +1,26 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: owen-wilson-wow-api.onrender.com
+  name: wow-service
+  path: /wows/random
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    id: f5b0ba7f-ebe1-4961-aeac-23c65cae719d
+    path_handling: v0
+    paths:
+    - /wow
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000
