@@ -1,0 +1,90 @@
+_format_version: "3.0"
+_konnect:
+  runtime_group_name: default
+plugins:
+- config:
+    access:
+    - kong.response.set_header("X-Upstream-Host", ngx.ctx.balancer_data.host)
+    body_filter: []
+    certificate: []
+    functions: []
+    header_filter: []
+    log: []
+    rewrite: []
+    ws_client_frame: []
+    ws_close: []
+    ws_handshake: []
+    ws_upstream_frame: []
+  enabled: true
+  name: pre-function
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  - ws
+  - wss
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: api.openai.com
+  name: OpenAI
+  path: /v1/completions
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  tags:
+    - _KonnectService:OpenAI
+  routes:
+  - https_redirect_status_code: 426
+    name: Curie
+    path_handling: v0
+    paths:
+    - /curie
+    plugins:
+    - config:
+        add:
+          body:
+          - model:text-curie-001
+        replace:
+          body:
+          - model:text-curie-001
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    strip_path: true
+  - https_redirect_status_code: 426
+    name: davinci
+    path_handling: v0
+    paths:
+    - /davinci
+    plugins:
+    - config:
+        add:
+          body:
+          - model:text-davinci-003
+        replace:
+          body:
+          - model:text-davinci-003
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    strip_path: true
+  write_timeout: 60000

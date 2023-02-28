@@ -1,0 +1,32 @@
+= Multi-cloud API Management with Kong Konnect
+Viktor Gamov <viktor@konghq.com>
+v1.0, 2023-02-22
+:toc:
+:imagesdir: assets/images
+:konnect: http://cloud.konghq.com
+:experimental: true
+
+== Agenda
+
+* [ ] intro to API - ChatGPT
+* [ ] setup service in Konnect
+* [ ] setup routes
+* [ ] setup plugins 
+
+== Setup and Prerequisites
+
+* Kubernetes cluster (US and EU)
+
+[source,bash]
+.create_clusters.sh
+----
+gcloud container clusters create kong-cluster-us --zone=us-east4 --num-nodes=1  #<1>
+gcloud container clusters create kong-cluster-eu --zone=us-west1 --num-nodes=1  #<2>
+----
+<1> Create cluster in US
+<2> Create cluster in EU
+
+== Links and Docs
+
+* https://platform.openai.com/docs/api-reference/completions[OpenAI Text Competions reference]
+
