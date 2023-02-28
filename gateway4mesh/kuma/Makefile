@@ -18,7 +18,7 @@ TIMESTAMP=$(shell date)
 pad=$(printf '%0.1s' "-"{1..80})
 
 
-KONG_MESH_VERSION ?= 2.0.0
+KONG_MESH_VERSION ?= 2.1.1
 KONG_NAMESPACE ?= kong
 KONG_HELM_RELEASE ?= kong
 DEMO_NAMESPACE ?= boutique
