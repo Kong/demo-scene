@@ -37,7 +37,9 @@ public class ServiceReactiveApplication {
           .registerPattern("en/dune.yml")
           .registerPattern("en/chuck_norris.yml")
           .registerPattern("en/hobbit.yml")
-          .registerPattern("en/*.yml");
+          .registerPattern("en/*.yml")
+          .registerPattern("kong-banner.txt")
+      ;
       hints.reflection().registerType(AbstractByteBufAllocator.class, MemberCategory.INVOKE_DECLARED_METHODS);
 
     }
