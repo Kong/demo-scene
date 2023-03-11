@@ -11,7 +11,7 @@ jobs:
     defaults:
       run:
         working-directory: kong-builders/11-10-2021/native-quote-service
-    runs-on: ARM64
+    runs-on: ubuntu-latest
     
     name: ☕️ 🐳 Build Native Quote Service App
     steps:
@@ -33,6 +33,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm64
+
       - name: Build Docker Image ARM64
         run: ./gradlew bootBuildImage --imageName gamussa/native-quote-service:latest-arm64
 
@@ -43,7 +48,7 @@ jobs:
     defaults:
       run:
         working-directory: quotes-service
-    runs-on: ARM64
+    runs-on: ubuntu-latest
     
     name: ☕️ 🐳 Build Reactive Quote Service App
     steps:
@@ -64,6 +69,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm64
 
       - name: Build Docker Image ARM64
         run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-arm64 --builder dashaun/builder-arm:tiny

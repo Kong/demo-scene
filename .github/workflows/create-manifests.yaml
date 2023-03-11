@@ -2,9 +2,9 @@ name: Create manifests for AMD64 and ARM64 images
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
 
 jobs:
   build:
