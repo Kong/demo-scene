@@ -1,13 +1,13 @@
 plugins {
-  id 'org.springframework.boot' version '2.6.6'
-  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'java'
-  id 'org.springframework.experimental.aot' version '0.11.0-RC1'
+  id 'org.springframework.boot' version '3.0.4'
+  id 'io.spring.dependency-management' version '1.1.0'
+  id 'org.graalvm.buildtools.native' version '0.9.20'
 }
 
 group = 'io.kong.developer'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = '17'
 
 repositories {
   maven { url 'https://repo.spring.io/milestone' }
@@ -19,7 +19,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-webflux'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'io.projectreactor:reactor-test'
-  implementation "com.github.javafaker:javafaker:1.0.2"
+  implementation "net.datafaker:datafaker:1.4.0"
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
@@ -30,10 +30,10 @@ test {
 }
 
 bootBuildImage {
-  builder = 'paketobuildpacks/builder:tiny'
+  builder = 'dashaun/builder:tiny'
   environment = ['BP_NATIVE_IMAGE'                : 'true',
                  'BP_NATIVE_IMAGE_BUILD_ARGUMENTS': '-H:Log=registerResource:3 -Dspring.spel.ignore=true -Dspring.native.remove-yaml-support=true']
-  imageName = "gamussa/native-quote-service:0.0.4-SNAPSHOT"
+  imageName = "gamussa/native-quote-service:0.0.5-SNAPSHOT"
   verboseLogging = true
 }
   
