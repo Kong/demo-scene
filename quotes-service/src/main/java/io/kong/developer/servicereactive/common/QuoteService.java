@@ -14,7 +14,7 @@ public class QuoteService {
   private final Faker faker;
 
   public QuoteService() {
-    faker = Faker.instance();
+    faker = new Faker();
   }
 
   public String getFakeQuote() {

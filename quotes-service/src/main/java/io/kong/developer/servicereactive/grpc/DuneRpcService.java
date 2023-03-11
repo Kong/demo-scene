@@ -2,8 +2,8 @@ package io.kong.developer.servicereactive.grpc;
 
 import com.google.protobuf.Empty;
 
-import net.datafaker.Dune;
 import net.datafaker.Faker;
+import net.datafaker.providers.entertainment.Dune;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +29,7 @@ public class DuneRpcService extends QuoteServiceGrpc.QuoteServiceImplBase {
   @Value("${grpc.server.dune.stream.limit:1}")
   private int limit;
 
-  final Dune dune = Faker.instance().dune();
+  final Dune dune = new Faker().dune();
 
   @Override
   public void getQuote(final Empty request,
