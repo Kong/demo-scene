@@ -1,7 +1,4 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: Build Java Apps for ARM64 images
 
 on:
   push:
@@ -14,9 +11,9 @@ jobs:
     defaults:
       run:
         working-directory: kong-builders/11-10-2021/native-quote-service
-    runs-on: ubuntu-latest
+    runs-on: ARM64
     
-    name: Build (jar and docker) Quotes Service app (with native binary flavor)
+    name: ☕️ 🐳 Build Native Quote Service App
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 17
@@ -36,19 +33,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker Image AMD64
-        run: ./gradlew bootBuildImage --imageName gamussa/native-quote-service:latest-amd64
+      - name: Build Docker Image ARM64
+        run: ./gradlew bootBuildImage --imageName gamussa/native-quote-service:latest-arm64
 
       - name: Push to Docker Hub
-        run: docker push gamussa/native-quote-service:latest-amd64
+        run: docker push gamussa/native-quote-service:latest-arm64
   
   quotes-service:
     defaults:
       run:
         working-directory: quotes-service
-    runs-on: ubuntu-latest
+    runs-on: ARM64
     
-    name: Build (jar and docker) Reactive Quotes Service app
+    name: ☕️ 🐳 Build Reactive Quote Service App
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 17
@@ -68,33 +65,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker Image AMD64
-        run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-amd64
+      - name: Build Docker Image ARM64
+        run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-arm64 --builder dashaun/builder-arm:tiny
 
       - name: Push to Docker Hub
-        run: docker push gamussa/reactive-quote-service:latest-amd64
-  
-  kafka-app:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: kafka-spring
-    
-    strategy:
-      matrix:
-        java: [ '11', '17' ]
-    name: Kafka Spring App - build with ${{ matrix.Java }}
-    
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up JDK ${{ matrix.Java }}
-        uses: actions/setup-java@v2
-        with:
-          java-version: ${{ matrix.java }}
-          distribution: 'liberica'
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: docker push gamussa/reactive-quote-service:latest-arm64
   

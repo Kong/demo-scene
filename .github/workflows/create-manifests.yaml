@@ -1,0 +1,25 @@
+name: Create manifests for AMD64 and ARM64 images
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create multiarch manifest
+        run: docker manifest create gamussa/reactive-quote-service:0.0.5-SNAPSHOT --amend gamussa/reactive-quote-service:latest-amd64 --amend gamussa/reactive-quote-service:latest-arm64
+
+      - name: Push Manifest to Docker Hub
+        run: docker manifest push gamussa/reactive-quote-service:0.0.5-SNAPSHOT
