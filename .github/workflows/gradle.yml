@@ -20,10 +20,10 @@ jobs:
     name: Build (jar and docker) Reactive Quotes Service app
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: 17
           distribution: 'liberica'
 
       - name: Grant execute permission for gradlew
@@ -44,13 +44,13 @@ jobs:
         run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-amd64
 
       - name: Build Docker Image ARM64
-        run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-arm64 --builder docker.io/dmikusa2pivotal/builder:focal
+        run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-arm64 --builder dashaun/builder:tiny
 
       - name: Push to Docker Hub
         run: docker push gamussa/reactive-quote-service:latest-amd64 && docker push gamussa/reactive-quote-service:latest-arm64
 
       - name: Create multiarch manifest
-        run: docker manifest create gamussa/reactive-quote-service:latest --amend gamussa/reactive-quote-service:latest-amd64 --amend gamussa/reactive-quote-service:latest-arm64
+        run: docker manifest create gamussa/reactive-quote-service:0.0.5-SNAPSHOT --amend gamussa/reactive-quote-service:latest-amd64 --amend gamussa/reactive-quote-service:latest-arm64
 
       - name: Push Manifest to Docker Hub
         run: docker manifest push gamussa/reactive-quote-service:latest
