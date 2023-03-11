@@ -13,35 +13,35 @@ jobs:
         working-directory: kong-builders/11-10-2021/native-quote-service
     runs-on: ubuntu-latest
     
-    name: ☕️ 🐳 Build Native Quote Service App
+    name: 📖 Build Native Quote Service App
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v3
+      - name: ☕️ Set up JDK 17
+        uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'liberica'
 
-      - name: Grant execute permission for gradlew
+      - name: 🛠️ Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build with Gradle
+      - name: ☕️ Build with Gradle
         run: ./gradlew build
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
+      - name: 🐳 Login to DockerHub
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up QEMU
+      - name: 🐳 Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
           platforms: arm64
 
-      - name: Build Docker Image ARM64
-        run: ./gradlew bootBuildImage --imageName gamussa/native-quote-service:latest-arm64
+      - name: 🐳 Build Docker Image ARM64
+        run: ./gradlew bootBuildImage --imageName gamussa/native-quote-service:latest-arm64 --builder dashaun/builder-arm:tiny
 
-      - name: Push to Docker Hub
+      - name: ⬆️ 🐳 Push to Docker Hub
         run: docker push gamussa/native-quote-service:latest-arm64
   
   quotes-service:
@@ -50,34 +50,34 @@ jobs:
         working-directory: quotes-service
     runs-on: ubuntu-latest
     
-    name: ☕️ 🐳 Build Reactive Quote Service App
+    name: 📖 Build Reactive Quote Service App
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v3
+      - name: ☕️ Set up JDK 17
+        uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'liberica'
 
-      - name: Grant execute permission for gradlew
+      - name: 🛠️ Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build with Gradle
+      - name: ☕️ Build with Gradle
         run: ./gradlew build
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
+      - name: 🐳 Login to DockerHub
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up QEMU
+      - name: 🐳 Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
           platforms: arm64
 
-      - name: Build Docker Image ARM64
+      - name: 🐳 Build Docker Image ARM64
         run: ./gradlew bootBuildImage --imageName gamussa/reactive-quote-service:latest-arm64 --builder dashaun/builder-arm:tiny
 
-      - name: Push to Docker Hub
+      - name: ⬆️ 🐳 Push to Docker Hub
         run: docker push gamussa/reactive-quote-service:latest-arm64
   
