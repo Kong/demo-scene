@@ -174,3 +174,5 @@ node_modules/
 /kong-builders/08-31-2022/kong-builders-go-plugin/bin/
 kong-quickstart.env
 kong.env
+tls.crt
+tls.key
