@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dune-quote-service
+  annotations:
+    konghq.com/protocols: grpc,grpcs
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: dune.kongproxy.me
+spec:
+  ingressClassName: kong
+  tls:
+    - secretName: dune-kongproxy-me
+      hosts:
+        - dune.kongproxy.me
+  rules:
+    - host: dune.kongproxy.me
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dune-quote-service
+                port:
+                  number: 9001

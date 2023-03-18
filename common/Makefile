@@ -9,6 +9,8 @@ ifneq (,$(findstring xterm,${TERM}))
 	BLUE		:= $(shell tput -Txterm setaf 6)
 	WHITE		:= $(shell tput -Txterm setaf 7)
 	RESET		:= $(shell tput -Txterm sgr0)
+	ITALIC		:= $(shell tput -Txterm sitm)
+	BOLD		:= $(shell tput -Txterm bold)
 else
 	BLACK        := ""
 	RED          := ""
@@ -30,6 +32,8 @@ colors: ## show all the colors
 	@echo "${PURPLE}PURPLE${RESET}"
 	@echo "${BLUE}BLUE${RESET}"
 	@echo "${WHITE}WHITE${RESET}"
+	@echo "${ITALIC}ITALIC${ITALIC}"
+	@echo "${BOLD}BOLD${BOLD}"
 
 echo_fail = printf "\e[31m✘ \033\e[0m$(1)\n"
 echo_pass = printf "\e[32m✔ \033\e[0m$(1)\n"
@@ -56,6 +60,12 @@ check-dependencies:
 	@$(call check-dependency,envsubst)
 	@$(call check-dependency,kumactl)
 	@$(call check-dependency,helm)
+	@echo ""
+
+check-grpc-dependencies:
+	@$(call check-dependency,kubectl)
+	@$(call check-dependency,jq)
+	@$(call check-dependency,grpcurl)
 	@echo ""
 
 brew-install-dependencies:

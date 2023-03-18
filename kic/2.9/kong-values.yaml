@@ -1,0 +1,13 @@
+ingressController:
+  enabled: true
+  image:
+    repository: kong/nightly-ingress-controller
+    tag: nightly
+    effectiveSemver: "2.9.0" # <-
+
+image:
+  #repository: kong
+  repository: kong/kong-gateway
+  tag: "3.2"
+  # tag: "3.1"
+  pullPolicy: Always

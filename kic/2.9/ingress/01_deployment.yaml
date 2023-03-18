@@ -2,16 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dune-quote-service
+  name: dune-quote-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dune-quote-service
+      app: dune-quote-deployment
   template:
     metadata:
       labels:
-        app: dune-quote-service
+        app: dune-quote-deployment
     spec:
       containers:
         - image: gamussa/reactive-quote-service:0.0.5-SNAPSHOT
