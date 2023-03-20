@@ -1,0 +1,3 @@
+resources:
+  - 01_deploy_httpbin.yaml
+  - 02_ingress.yaml

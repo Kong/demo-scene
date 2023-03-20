@@ -101,6 +101,12 @@ demo-app-grpc-reflection: check-grpc-dependencies
 validate-cert:
 	openssl s_client -showcerts -verify 3 -servername ${PUBLIC_DOMAIN} -connect ${PUBLIC_DOMAIN}:443 > /dev/null
 
+demo-app-httpbin-install: check-dependencies
+	kubectl apply -k ./discovery -n kic
+
+demo-app-httpbin-uninstall: check-dependencies
+	kubectl delete -k ./discovery -n kic
+
 help:
 	@echo ""
 	@echo "    ${BLUE}:: ${GREEN}Kong Ingress Controller KIC demo${RESET} ${BLUE}::${RESET}"
