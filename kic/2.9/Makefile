@@ -33,6 +33,7 @@ endef
 
 .DEFAULT_GOAL := help
 
+#region minikube
 minikube-create-cluster:
 	@$(call print-header,"creating new minikube cluster")
 	@$(call print-prompt)
@@ -44,12 +45,18 @@ minikube-destroy-cluster:
 	@$(call print-prompt)
 	minikube delete --all
 	@echo ""
+#end region
+
+# https://gateway-api.sigs.k8s.io/guides/#install-experimental-channel
+gateway-api-install: check-dependencies
+	kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.6.2/experimental-install.yaml
+
+gateway-api-uninstall: check-dependencies
+	kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.6.2/experimental-install.yaml
 			
 kong-gateway-install: check-dependencies
 	@echo "☸️  Installing Kong 🦍 to ${GREEN}${KONG_NAMESPACE}${RESET} namespace..."
-	kubectl create namespace ${KONG_NAMESPACE}
-	helm repo add kong https://charts.konghq.com && helm repo update
-	helm install -n ${KONG_NAMESPACE} ${KONG_HELM_RELEASE} kong/kong -f kong-values.yaml
+	helm upgrade --install ${KONG_HELM_RELEASE} -n ${KONG_NAMESPACE}  --create-namespace -f kong-values.yaml ~/projects/kong/charts/charts/kong
 	kubectl -n ${KONG_NAMESPACE} wait --for=condition=Available deployment ${KONG_HELM_RELEASE}-kong
 	@echo ""
 
@@ -68,6 +75,7 @@ demo-app-install: check-dependencies
 	@echo "☸️  Installing 🐛 Dune Quote Generator ${GREEN}${DEMO_NAMESPACE}${RESET} namespace..."
 	
 	@echo "☸️  1) Generating 🤫 secrets  ${GREEN}${DEMO_NAMESPACE}${RESET} namespace..."
+	@echo ""	
 	openssl req -x509 -nodes -subj "/CN=kongproxy.me" -newkey rsa:4096 -sha256 -keyout server.key -out server.crt -days 3650
 	kubectl create secret generic grpc-cert-chain --from-file=server.crt=server.crt
 	kubectl create secret generic grpc-pk --from-file=server.key=server.key
@@ -88,15 +96,16 @@ dig:
 demo-app-test: check-grpc-dependencies
 	@echo "🌎 validating connection to demo app"
 	@echo "🌪️  testing gRPC streaming because ${ITALIC}Spice Must Flow...${RESET}"
+	@echo ""
 	PROXY_IP=$(shell kubectl -n kong get service ${KONG_HELM_RELEASE}-kong-proxy -o=go-template='{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}')
-	grpcurl -servername $(PUBLIC_DOMAIN) $(PROXY_IP):443 io.kong.developer.quoteservice.QuoteService/GetQuoteStream 
+	grpcurl -servername $(PUBLIC_DOMAIN) ${PROXY_IP}:443 io.kong.developer.quoteservice.QuoteService/GetQuoteStream 
 
 demo-app-grpc-reflection: check-grpc-dependencies
 	@echo "🌎 validating connection to demo app"
 	@echo ""
 	PROXY_IP=$(shell kubectl -n kong get service ${KONG_HELM_RELEASE}-kong-proxy -o=go-template='{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}')
 	# grpcurl $(PUBLIC_DOMAIN):443 list
-	grpcurl -servername $(PUBLIC_DOMAIN) $(PROXY_IP):443 list
+	grpcurl -servername $(PUBLIC_DOMAIN) ${PROXY_IP}:443 list
 
 validate-cert:
 	openssl s_client -showcerts -verify 3 -servername ${PUBLIC_DOMAIN} -connect ${PUBLIC_DOMAIN}:443 > /dev/null

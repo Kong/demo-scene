@@ -4,6 +4,8 @@ ingressController:
     repository: kong/nightly-ingress-controller
     tag: nightly
     effectiveSemver: "2.9.0" # <-
+  args:
+    - --feature-gates=GatewayAlpha=true
 
 image:
   #repository: kong

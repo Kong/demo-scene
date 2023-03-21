@@ -25,7 +25,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: GRPCRoute
 metadata:
-  name: grpcbin
+  name: grpcbdune
 spec:
   parentRefs:
     - name: kong
