@@ -19,7 +19,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-webflux'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'io.projectreactor:reactor-test'
-  implementation "net.datafaker:datafaker:1.4.0"
+  implementation "net.datafaker:datafaker:1.9.0"
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
