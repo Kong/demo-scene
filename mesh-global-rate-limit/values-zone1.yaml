@@ -1,0 +1,23 @@
+kuma:
+  controlPlane:
+    mode: zone
+    zone: zone1
+    kdsGlobalAddress: grpcs://us.mesh.sync.konghq.com:443
+    konnect:
+      cpId: ADAPT_TO_YOUR_CP_ID
+    secrets:
+      - Env: KMESH_MULTIZONE_ZONE_KDS_AUTH_CP_TOKEN_INLINE
+        Secret: cp-token
+        Key: token
+  ingress:
+    enabled: true
+  egress:
+    enabled: true
+  experimental:
+    deltaKds: true
+ratelimit:
+  enabled: true
+  exposeDebugPort: true
+  redis:
+    address: ADAPT_TO_YOUR_REDIS_ADDRESS
+    port: 6379
