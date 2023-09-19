@@ -1,0 +1,67 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kuma-test
+  labels:
+    kuma.io/sidecar-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: srv-000
+  namespace: kuma-test
+  labels:
+    app: srv-000
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: srv-000
+  template:
+    metadata:
+      labels:
+        app: srv-000
+      annotations:
+        kuma.io/mesh: default
+    spec:
+      containers:
+        - name: service
+          image: nicholasjackson/fake-service:v0.21.1
+          ports:
+            - containerPort: 9090
+          env:
+            - name: SERVICE
+              value: "srv-000"
+            - name: UPSTREAM_URIS
+              value: ""
+          resources:
+            limits:
+              memory: "32Mi"
+              cpu: "50m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: srv-000
+  namespace: kuma-test
+spec:
+  selector:
+    app: srv-000
+  ports:
+    - protocol: TCP
+      appProtocol: http
+      port: 80
+      targetPort: 9090
+
+---
+apiVersion: kuma.io/v1alpha1
+kind: MeshGatewayInstance
+metadata:
+  name: edge-gateway
+  namespace: kuma-test
+spec:
+  replicas: 1
+  serviceType: LoadBalancer
+  tags:
+    kuma.io/service: edge-gateway

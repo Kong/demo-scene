@@ -1,0 +1,68 @@
+type: Mesh
+name: default
+mtls:
+  backends:
+    - name: ca-1
+      type: builtin
+  enabledBackend: ca-1
+routing:
+  localityAwareLoadBalancing: true
+---
+type: MeshGlobalRateLimit
+mesh: default
+name: demo-rate-limit
+namespace: kong-mesh-system
+spec:
+  targetRef:
+    kind: MeshService
+    name: srv-000_kuma-test_svc_80
+  from:
+    - targetRef:
+        kind: Mesh
+      default:
+        backend:
+          rateLimitService:
+            limitOnServiceFail: false
+            url: http://kong-mesh-ratelimit-service.kong-mesh-system:10003
+            timeout: 25ms
+        http:
+          onRateLimit:
+            status: 423
+            headers:
+              set:
+                - name: "x-kuma-rate-limited"
+                  value: "1"
+          requestRate:
+            num: 140 # 2 * 60 + 20 (tolerate a bit more than 2rps
+            interval: 1m
+---
+type: MeshGateway
+mesh: default
+name: edge-gateway
+selectors:
+  - match:
+      kuma.io/service: edge-gateway
+conf:
+  listeners:
+    - port: 8080
+      protocol: HTTP
+      tags:
+        port: http/8080
+---
+type: MeshGatewayRoute
+mesh: default
+name: edge-gateway-route
+selectors:
+  - match:
+      kuma.io/service: edge-gateway
+      port: http/8080
+conf:
+  http:
+    rules:
+      - matches:
+          - path:
+              match: PREFIX
+              value: /
+        backends:
+          - destination:
+              kuma.io/service: srv-000_kuma-test_svc_80
