@@ -1,0 +1,44 @@
+type: Mesh
+name: default
+mtls:
+  enabledBackend: ca-1
+  backends:
+    - name: ca-1
+      type: builtin
+metrics:
+  enabledBackend: prometheus-1
+  backends:
+    - name: prometheus-1
+      type: prometheus
+      conf:
+        skipMTLS: true
+        envoy:
+          usedOnly: true
+---
+type: MeshTrace
+name: otel
+mesh: default
+spec:
+  targetRef:
+    kind: Mesh
+  default:
+    backends:
+      - type: OpenTelemetry
+        openTelemetry:
+          endpoint: otel-collector.observability.svc:4317
+---
+type: MeshAccessLog
+name: otel
+mesh: default
+spec:
+  targetRef:
+    kind: Mesh
+  from:
+    - targetRef:
+        kind: Mesh
+      default:
+        backends:
+          - type: OpenTelemetry
+            openTelemetry:
+              endpoint: otel-collector.observability.svc:4317
+
