@@ -1,0 +1,108 @@
+apiVersion: kuma.io/v1alpha1
+kind: Mesh
+metadata:
+  name: default
+spec:
+  metrics:
+    backends:
+      - conf:
+          skipMTLS: true
+          path: /metrics
+          port: 5670
+          tags:
+            kuma.io/service: dataplane-metrics
+        name: prometheus-1
+        type: prometheus
+    enabledBackend: prometheus-1
+  mtls:
+    backends:
+      - name: ca-1
+        type: builtin
+    enabledBackend: ca-1
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kafka
+  annotations:
+    kuma.io/mesh: default
+  labels:
+    kuma.io/sidecar-injection: enabled
+---
+# Provide individual vips for each broker in the format of `cluster1-0.cluster1.kafka.mesh:<port>` where cluster1-0 is the pod name,
+# cluster1 is the value of the label `app`.
+# We use a custom label `app-type` to only provide these vips for pods that are kafka
+apiVersion: kuma.io/v1alpha1
+kind: VirtualOutbound
+mesh: default
+metadata:
+  name: kafka-per-broker
+spec:
+  selectors:
+    - match:
+        k8s.kuma.io/namespace: kafka
+        app-type: kafka
+        kuma.io/service: "*"
+        statefulset.kubernetes.io/pod-name: "*"
+  conf:
+    host: "{{.pod}}.{{.app}}.kafka.mesh"
+    port: "{{.port}}"
+    parameters:
+      - name: "app"
+      - name: svc
+        tagKey: "kuma.io/service"
+      - name: pod
+        tagKey: "statefulset.kubernetes.io/pod-name"
+      - name: port
+        tagKey: "k8s.kuma.io/service-port"
+---
+# Provide a unique address like `cluster1.kafka.mesh:9092` for each statefulset. Where cluster1 is the value of the label `app`.
+# This will front all brokers and provide an easy way to access the kafka cluster (can be given out to clients).
+# We use a custom label `app-type` to only provide these vips for pods that are kafka
+apiVersion: kuma.io/v1alpha1
+kind: VirtualOutbound
+mesh: default
+metadata:
+  name: kafka-bootstrap
+spec:
+  selectors:
+    - match:
+        k8s.kuma.io/namespace: kafka
+        kuma.io/service: "*"
+        app-type: kafka
+        k8s.kuma.io/service-port: "9092"
+        statefulset.kubernetes.io/pod-name: "*"
+  conf:
+    host: "{{.app}}.kafka.mesh"
+    port: "9092"
+    parameters:
+      - name: app
+      - name: svc
+        tagKey: "kuma.io/service"
+---
+# Provide individual vips for each zookeeper instances in the format of `zk1-0.zk.kafka.mesh:<port>` where zk1-0 is the pod name,
+# zk is the value of the label `app`.
+# We use a custom label `app-type` to only provide these vips for pods that are zk
+apiVersion: kuma.io/v1alpha1
+kind: VirtualOutbound
+mesh: default
+metadata:
+  name: zk-instances
+spec:
+  selectors:
+    - match:
+        k8s.kuma.io/namespace: kafka
+        app-type: zk
+        kuma.io/service: "*"
+        statefulset.kubernetes.io/pod-name: "*"
+  conf:
+    host: "{{.pod}}.{{.app}}.kafka.mesh"
+    port: "{{.port}}"
+    parameters:
+      - name: "app"
+      - name: svc
+        tagKey: "kuma.io/service"
+      - name: pod
+        tagKey: "statefulset.kubernetes.io/pod-name"
+      - name: port
+        tagKey: "k8s.kuma.io/service-port"

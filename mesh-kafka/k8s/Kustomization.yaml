@@ -1,0 +1,6 @@
+resources:
+  - 00-kuma.yaml
+  - 01-kraft-kafka.yaml
+  - 02-zk.yaml
+  - 03-zk-kafka.yaml
+  - 04-workload.yaml
