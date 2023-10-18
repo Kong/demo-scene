@@ -4,6 +4,23 @@ metadata:
   name: kong
   namespace: default
 spec:
-  dataPlaneDeploymentOptions:
-    containerImage: kong/kong-gateway
-    version: "3.0"
+  dataPlaneOptions:
+    deployment:
+      podTemplateSpec:
+        spec:
+          containers:
+            - name: proxy
+              image: kong:3.4.2
+              readinessProbe:
+                initialDelaySeconds: 1
+                periodSeconds: 1
+  controlPlaneOptions:
+    deployment:
+      podTemplateSpec:
+        spec:
+          containers:
+            - name: controller
+              image: kong/kubernetes-ingress-controller:2.12.0
+              env:
+                - name: CONTROLLER_LOG_LEVEL
+                  value: debug
