@@ -1,0 +1,35 @@
+= Kong Operator Demo 
+Viktor Gamov <viktor@konghq.com>
+v1.0, 2023-10-20
+:toc:
+:imagesdir: assets/images
+:homepage: http://konghq.com
+
+.status of the doc
+****
+This is WIP draft
+****
+
+== steps to get things going 
+
+[source]
+.run.sh
+----
+./install_all.sh #<1>
+
+kubectl apply -f https://raw.githubusercontent.com/gAmUssA/httpbin-go/main/deployment.yaml #<2>
+
+kubectl -n default wait --for=condition=Available=true --timeout=120s deployment/httpbin-go #<3>
+
+kubectl apply -f ./default  #<4>
+kubectl apply -f app/myhttpbin_httproute.yaml   #<5>
+
+kubectl apply -f ./default  #<6>
+----
+<1> KGO: installs CRDs and Controller Manager
+<2> Deploy my httpbin like service 
+<3> wait until deployment stabilizes
+<4> Deploy `Gateway` and `GatewayClass` with default config
+<5> Deploy `HTTPRoute`
+<6> upgrade with config
+
