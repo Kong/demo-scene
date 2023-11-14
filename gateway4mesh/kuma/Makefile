@@ -18,7 +18,7 @@ TIMESTAMP=$(shell date)
 pad=$(printf '%0.1s' "-"{1..80})
 
 
-KONG_MESH_VERSION ?= 2.1.1
+KONG_MESH_VERSION ?= 2.4.3
 KONG_NAMESPACE ?= kong
 KONG_HELM_RELEASE ?= kong
 DEMO_NAMESPACE ?= boutique
@@ -80,7 +80,7 @@ kong-mesh-policy: check-dependencies
 demo-microservices-install: check-dependencies
 	@echo "${BLUE}𐄳${RESET} 🐻‍❄️ Preparing environment for microservices..."
 	kubectl create namespace ${DEMO_NAMESPACE}     
-	kubectl patch namespace ${DEMO_NAMESPACE} -p '{"metadata":{"annotations":{"kuma.io/sidecar-injection":"enabled"}}}'
+	kubectl patch namespace ${DEMO_NAMESPACE} -p '{"metadata":{"labels":{"kuma.io/sidecar-injection":"enabled"}}}'
 	@echo ""
 	@echo "☸️  Installing microservices Demo app"
 	git clone https://github.com/GoogleCloudPlatform/microservices-demo.git 
@@ -131,17 +131,13 @@ locust-install: check-dependencies
 OBS_COMPONENTS = metrics tracing logging
 obs-tools-install: check-dependencies
 	@echo "☸️  Installing Observability Tools - Prometheus 🔥, Grafana 📊, Jaeger, Loki"
-	kumactl install metrics | kubectl apply -f -
-	kumactl install tracing | kubectl apply -f -
-	kumactl install logging | kubectl apply -f -
+	kumactl install observability | kubectl apply -f -
 	@echo ""
 
 obs-tools-uninstall: check-dependencies
 	@echo "❌ Uninstalling Observability Tools"
 	# $(foreach var,$(OBS_COMPONENTS),"kumactl install $(var) | kubectl delete -f - ";)
-	kumactl install metrics | kubectl delete -f -
-	kumactl install tracing | kubectl delete -f -
-	kumactl install logging | kubectl delete -f -
+	kumactl install observability | kubectl delete -f -
 	@echo ""
 
 plugin-rate-limiting-install:
