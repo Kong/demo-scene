@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster1-producer
+  namespace: kafka
+  labels:
+    app: cluster1-producer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cluster1-producer
+  template:
+    metadata:
+      labels:
+        app: cluster1-producer
+    spec:
+      containers:
+        - name: app
+          image: bitnami/kafka:3.5.1
+          command:
+            - bash
+            - -c
+            - |
+              /opt/bitnami/kafka/bin/kafka-verifiable-producer.sh \
+              --topic verifiable --bootstrap-server cluster1.kafka.mesh:9092 \
+              --throughput 2
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-ce", "kill -s TERM 1; while $(kill -0 1 2>/dev/null); do sleep 1; done"]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster1-consumer
+  namespace: kafka
+  labels:
+    app: cluster1-consumer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cluster1-consumer
+  template:
+    metadata:
+      labels:
+        app: cluster1-consumer
+    spec:
+      containers:
+        - name: app
+          image: bitnami/kafka:3.5.1
+          command:
+            - bash
+            - -c
+            - |
+              /opt/bitnami/kafka/bin/kafka-verifiable-consumer.sh \
+              --topic verifiable --bootstrap-server cluster1.kafka.mesh:9092 \
+              --group-id test1 --verbose --group-instance-id ${HOSTNAME}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-ce", "kill -s TERM 1; while $(kill -0 1 2>/dev/null); do sleep 1; done"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster2-producer
+  namespace: kafka
+  labels:
+    app: cluster2-producer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cluster2-producer
+  template:
+    metadata:
+      labels:
+        app: cluster2-producer
+    spec:
+      containers:
+        - name: app
+          image: bitnami/kafka:3.5.1
+          command:
+            - bash
+            - -c
+            - |
+              /opt/bitnami/kafka/bin/kafka-verifiable-producer.sh \
+              --topic verifiable --bootstrap-server cluster2.kafka.mesh:9092 \
+              --throughput 2
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-ce", "kill -s TERM 1; while $(kill -0 1 2>/dev/null); do sleep 1; done"]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster2-consumer
+  namespace: kafka
+  labels:
+    app: cluster2-consumer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cluster2-consumer
+  template:
+    metadata:
+      labels:
+        app: cluster2-consumer
+    spec:
+      containers:
+        - name: app
+          image: bitnami/kafka:3.5.1
+          command:
+            - bash
+            - -c
+            - |
+              /opt/bitnami/kafka/bin/kafka-verifiable-consumer.sh \
+              --topic verifiable --bootstrap-server cluster2.kafka.mesh:9092 \
+              --group-id test1 --verbose --group-instance-id ${HOSTNAME}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-ce", "kill -s TERM 1; while $(kill -0 1 2>/dev/null); do sleep 1; done"]
