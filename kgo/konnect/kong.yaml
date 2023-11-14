@@ -1,0 +1,27 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: bg-demo-cp
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: httpbin-go.default.svc.cluster.local
+  name: httpcan
+  port: 8080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: route
+    path_handling: v0
+    paths:
+    - /cgi-bin
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000

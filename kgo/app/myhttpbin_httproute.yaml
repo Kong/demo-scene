@@ -1,0 +1,20 @@
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: httpbin-go
+  namespace: default
+  annotations:
+    konghq.com/strip-path: "true"
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: kong
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /cgi-bin
+      backendRefs:
+        - name: httpbin-go
+          port: 8080

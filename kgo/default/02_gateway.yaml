@@ -2,6 +2,7 @@ kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1beta1
 metadata:
   name: kong
+  namespace: default
 spec:
   gatewayClassName: kong
   listeners:
