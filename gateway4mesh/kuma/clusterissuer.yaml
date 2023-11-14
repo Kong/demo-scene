@@ -14,7 +14,7 @@ spec:
           ingress:
             podTemplate:
               metadata:
-                annotations:
+                labels:
                   kuma.io/sidecar-injection: "false"
             class: kong
             
