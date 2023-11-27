@@ -1,0 +1,12 @@
+[Unit]
+Description=Kuma Zone Ingress
+After=network.target
+
+[Service]
+Type=simple
+User=kuma-dp
+ExecStart=/usr/local/bin/kuma-dp run --proxy-type=ingress --cp-address=https://127.0.0.1:5678 --dataplane-file=/etc/kong-mesh/zone-ingress-config.yaml --dataplane-token-file=/etc/kong-mesh/zone-ingress-token
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+---
+# tasks file for otel-collector
+- name: Check if we've downloaded OTel Collector
+  stat:
+    path: /tmp/otelcol.deb
+  register: otel_collector_check
+
+- name: Download OTel Collector
+  when: not otel_collector_check.stat.exists
+  ansible.builtin.get_url:
+    url: https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.83.0/otelcol_0.83.0_linux_amd64.deb
+    dest: /tmp/otelcol.deb
+
+- name: Install OTel Collector
+  ansible.builtin.apt:
+    deb: /tmp/otelcol.deb
+
+- name: Write OTel Config
+  template:
+    src: otel-config.yaml
+    dest: /etc/otelcol/config.yaml
+  notify:
+    - restart otel-collector

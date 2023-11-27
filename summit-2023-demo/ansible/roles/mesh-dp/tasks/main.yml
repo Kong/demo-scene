@@ -1,0 +1,54 @@
+---
+- name: Create Mesh DP Config
+  template:
+    src: dp-config.j2
+    dest: /etc/kong-mesh/dp-config.yaml
+    owner: "{{ kuma_user }}"
+  notify:
+    - restart kuma-dp
+
+- name: Generate Mesh DP token
+  when: start_services
+  ansible.builtin.shell: |
+    kumactl generate dataplane-token \
+      --name {{zone_name}}-dp \
+      --mesh default \
+      --valid-for 8760h > /etc/kong-mesh/dp-token
+  retries: 6
+  delay: 5
+  args:
+    creates: /etc/kong-mesh/dp-token
+  notify:
+    - restart kuma-dp
+
+- name: Create kuma-dp systemd unit
+  copy:
+    src: systemd-kuma-dp.service
+    dest: /lib/systemd/system/kuma-dp.service
+    owner: "{{ kuma_user }}"
+  notify:
+    - restart kuma-dp
+
+- name: Enable kuma-dp systemd unit
+  when: start_services
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: kuma-dp.service
+    state: started
+
+- name: Enable mesh transparent-proxy
+  when: start_services
+  ansible.builtin.shell: |
+    kumactl install transparent-proxy \
+      --kuma-dp-user kuma-dp \
+      --exclude-outbound-udp-ports-for-uids=53:0 \
+      --exclude-outbound-tcp-ports-for-uids=80:0 \
+      --exclude-outbound-tcp-ports-for-uids=443:0 \
+      --exclude-inbound-ports 22 \
+      --skip-dns-conntrack-zone-split --vnet docker0:172.17.0.1/16 \
+      --redirect-dns \
+      && touch /etc/kong-mesh/transparent-proxy-enabled;
+  args:
+    creates: /etc/kong-mesh/transparent-proxy-enabled
+  async: "{{ ansible_timeout }}"
+  poll: 2

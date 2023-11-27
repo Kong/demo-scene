@@ -1,0 +1,19 @@
+kuma:
+  controlPlane:
+    image:
+      tag: 0.0.0-preview.v844bb81ba
+    mode: zone
+    zone: eks
+    kdsGlobalAddress: grpcs://us.mesh.sync.konghq.com:443
+    konnect:
+      cpId: e939fbce-393c-423a-b79d-15f8772166bf
+    secrets:
+      - Env: KMESH_MULTIZONE_ZONE_KDS_AUTH_CP_TOKEN_INLINE
+        Secret: cp-token
+        Key: token
+  ingress:
+    enabled: true
+  egress:
+    enabled: true
+  experimental:
+    deltaKds: true

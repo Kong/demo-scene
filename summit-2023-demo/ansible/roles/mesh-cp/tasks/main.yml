@@ -1,0 +1,55 @@
+---
+- name: Write auth token to file
+  copy:
+    content: "{{ mesh_spat }}"
+    dest: /etc/kong-mesh/cp-token
+    owner: "{{ kuma_user }}"
+  notify:
+    - restart kuma-cp
+
+- name: Write CP Config
+  copy:
+    content: |
+      environment: universal
+      mode: zone
+      multizone:
+        zone:
+          name: {{ zone_name }}
+          globalAddress: grpcs://us.mesh.sync.konghq{{ domain }}:443
+      kmesh:
+        multizone:
+          zone:
+            konnect:
+              cpId: {{ mesh_cp_id }}
+      experimental:
+        kdsDeltaEnabled: true
+    dest: /etc/kong-mesh/cp-config.yaml
+    owner: "{{ kuma_user }}"
+  notify:
+    - restart kuma-cp
+
+- name: Create kuma-cp unit
+  copy:
+    src: "systemd-kuma-cp.service"
+    dest: /lib/systemd/system/kuma-cp.service
+  notify:
+    - restart kuma-cp
+
+- name: Enable kuma-cp unit
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: kuma-cp.service
+    state: started
+  register: cp_unit
+
+- name: Wait until CP API is online
+  uri:
+    url: http://localhost:5681/config
+    return_content: no
+    validate_certs: no
+    status_code:
+      - 200
+  until: uri_output.status == 200
+  retries: 15 # Retries for 24 * 5 seconds = 120 seconds = 2 minutes
+  delay: 2 # Every 2 seconds
+  register: uri_output

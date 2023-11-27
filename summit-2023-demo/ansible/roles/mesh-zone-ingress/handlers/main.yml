@@ -1,0 +1,7 @@
+---
+- name: restart zone-ingress
+  when: start_services
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: kuma-zone-ingress.service
+    state: restarted

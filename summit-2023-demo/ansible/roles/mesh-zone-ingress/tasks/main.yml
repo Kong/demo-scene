@@ -1,0 +1,54 @@
+---
+- name: Check if we have a zone ingress token
+  stat:
+    path: /etc/kong-mesh/zone-ingress-token
+  register: zone_ingress_check
+
+- name: Generate Mesh Zone Ingress token
+  when: not zone_ingress_check.stat.exists
+  ansible.builtin.shell: |
+    kumactl generate zone-token \
+      --scope ingress \
+      --zone {{ zone_name }} \
+      --valid-for 8760h
+  delegate_to: 127.0.0.1
+  become: false
+  register: zone_ingress_token
+
+- name: Write Mesh Zone Ingress token to VM
+  when: not zone_ingress_check.stat.exists
+  copy:
+    content: "{{ zone_ingress_token.stdout }}"
+    dest: /etc/kong-mesh/zone-ingress-token
+    owner: "{{ kuma_user }}"
+  notify:
+    - restart zone-ingress
+
+- name: Write zone ingress config to file
+  copy:
+    content: |
+      type: ZoneIngress
+      name: zone-ingress
+      networking:
+        address: {{ ansible_default_ipv4.address }}
+        port: 10001
+        advertisedAddress: {{ ansible_host }}
+        advertisedPort: 10001
+        admin:
+          port: 9902
+    dest: /etc/kong-mesh/zone-ingress-config.yaml
+    owner: "{{ kuma_user }}"
+
+- name: Create kuma-zone-ingress unit
+  copy:
+    src: "systemd-kuma-zone-ingress.service"
+    dest: /lib/systemd/system/kuma-zone-ingress.service
+  notify:
+    - restart zone-ingress
+
+- name: Enable kuma-zone-ingress.service unit
+  when: start_services
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: "kuma-zone-ingress.service"
+    state: started

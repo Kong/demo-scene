@@ -1,0 +1,6 @@
+---
+- name: Create enable-services utility
+  copy:
+    src: "enable-services.sh"
+    dest: /usr/local/bin/enable-services
+    mode: "0755"

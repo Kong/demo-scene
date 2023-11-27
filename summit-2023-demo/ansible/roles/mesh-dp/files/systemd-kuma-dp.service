@@ -1,0 +1,12 @@
+[Unit]
+Description=Kuma DP
+After=network.target
+
+[Service]
+Type=exec
+User=kuma-dp
+ExecStart=/usr/local/bin/kuma-dp run --cp-address=https://127.0.0.1:5678 --dataplane-file=/etc/kong-mesh/dp-config.yaml --dataplane-token-file=/etc/kong-mesh/dp-token
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
