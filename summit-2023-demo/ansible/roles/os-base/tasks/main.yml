@@ -1,0 +1,87 @@
+---
+- name: Install required system packages
+  apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - python3-pip
+      - virtualenv
+      - python3-setuptools
+      - jq
+    state: latest
+    cache_valid_time: 3600
+
+- name: Install snap packages
+  community.general.snap:
+    name:
+      - yq
+
+- name: Check if Docker is installed
+  command: which docker
+  changed_when: false
+  failed_when: docker_installed.rc not in [0,1]
+  register: docker_installed
+
+- name: Add Docker GPG apt Key
+  when: docker_installed.rc != 0
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  when: docker_installed.rc != 0
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu jammy stable
+    state: present
+
+- name: Install Docker
+  when: docker_installed.rc != 0
+  apt:
+    name: docker-ce
+    state: latest
+    update_cache: true
+
+- name: Install Docker Module for Python
+  when: docker_installed.rc != 0
+  pip:
+    name: docker
+
+- name: Create "docker" group
+  group:
+    name: docker
+    state: present
+
+- name: Add "ubuntu" user to "docker" group
+  user:
+    name: ubuntu
+    groups:
+      - docker
+    append: yes
+
+- name: Create flight removal helper
+  copy:
+    content: |
+      #!/usr/bin/env bash
+      echo "==> Checking flights.mesh /health"
+      curl http://flights.mesh/health
+      echo ""
+      echo "==> Removing 'flights' docker container"
+      docker rm flights -f > /dev/null
+      echo "docker rm flights -f"
+      echo ""
+      echo "==> Removing 'flights' from /etc/kong-mesh/dp-config.yaml"
+      cat /etc/kong-mesh/dp-config.yaml | yq 'del(.networking.inbound[] | select(.tags["kuma.io/service"] == "flights"))' | sudo tee /etc/kong-mesh/dp-config.yaml > /dev/null
+      echo "yq 'del(.networking.inbound[] | select(.tags["kuma.io/service"] == "flights"))' /etc/kong-mesh/dp-config.yaml"
+      echo ""
+      echo "==> Restarting kuma-dp"
+      sudo systemctl restart kuma-dp
+      echo "==> ✅ Done"
+      sleep 3
+      echo ""
+      echo "==> Checking flights.mesh /health"
+      curl http://flights.mesh/health
+    dest: /usr/local/bin/rm-flights
+    owner: "ubuntu"
+    mode: "0755"

@@ -1,0 +1,13 @@
+[Unit]
+Description=Kuma CP
+After=network.target
+
+[Service]
+Environment=KMESH_MULTIZONE_ZONE_KDS_AUTH_CP_TOKEN_PATH=/etc/kong-mesh/cp-token
+Type=exec
+User=kuma-dp
+ExecStart=/usr/local/bin/kuma-cp run --config-file /etc/kong-mesh/cp-config.yaml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

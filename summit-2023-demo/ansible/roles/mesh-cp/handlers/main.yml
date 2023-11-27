@@ -1,0 +1,7 @@
+---
+- name: restart kuma-cp
+  when: start_services
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: kuma-cp.service
+    state: restarted

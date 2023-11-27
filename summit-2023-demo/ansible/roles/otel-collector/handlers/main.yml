@@ -1,0 +1,6 @@
+---
+# handlers file for otel-collector
+- name: restart otel-collector
+  ansible.builtin.systemd_service:
+    name: "otelcol.service"
+    state: restarted

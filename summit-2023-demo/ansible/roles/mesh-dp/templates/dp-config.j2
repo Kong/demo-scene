@@ -1,0 +1,17 @@
+type: Dataplane
+mesh: default
+name: {{ zone_name }}-dp
+networking:
+  address: {{ ansible_default_ipv4.address }}
+  inbound:
+{% for service in kongair_services %}{% if service.enabled %}
+  - port: 1{{ service.listen_port }}
+    servicePort: {{ service.listen_port }}
+    serviceAddress: 127.0.0.1
+    tags:
+      kuma.io/service: {{ service.name }}
+      kuma.io/protocol: http
+{% endif %}{% endfor %}
+  transparentProxying:
+    redirectPortInbound: 15006
+    redirectPortOutbound: 15001

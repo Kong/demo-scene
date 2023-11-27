@@ -1,0 +1,25 @@
+---
+# tasks file for kongair-services
+- name: Create default containers
+  when: item.enabled == true
+  community.docker.docker_container:
+    name: "{{ item.name }}"
+    image: "{{ item.image }}"
+    state: started
+    published_ports:
+      - "{{ item.listen_port }}:{{ item.service_port }}"
+    detach: true
+    debug: true
+    pull: false
+    env: "{{ item.env | default({}) }}"
+    network_mode: bridge
+  loop: "{{ kongair_services }}"
+  notify: restart kuma-dp
+
+- name: Stop unused containers
+  when: item.enabled == false
+  community.docker.docker_container:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ kongair_services }}"
+  notify: restart kuma-dp

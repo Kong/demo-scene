@@ -1,0 +1,74 @@
+- name: Configure Flight Data
+  hosts: flightdata
+  become: true
+  vars:
+    kuma_user: kuma-dp
+    kuma_user_id: 5678
+
+    mesh_spat: spat_ABC123
+    mesh_cp_id: be409412-c27e-4319-bcc5-....
+    zone_name: flight-data
+    domain: .com
+
+    start_services: true
+
+    kongair_services:
+      - name: flights
+        enabled: true
+        image: ghcr.io/kong/kongair-flights:latest
+        listen_port: 8080
+        service_port: 8080
+      - name: routes
+        enabled: true
+        image: ghcr.io/kong/kongair-routes:latest
+        listen_port: 8081
+        service_port: 8080
+
+  roles:
+    - role: mesh-cp
+      tags: cp
+    - role: mesh-dp
+      tags: dp
+    - role: mesh-zone-ingress
+      tags: ingress
+    - role: kongair-services
+      tags: services
+
+- name: Configure Sales
+  hosts: sales
+  become: true
+  vars:
+    kuma_user: kuma-dp
+    kuma_user_id: 5678
+
+    mesh_spat: spat_ABC123
+    mesh_cp_id: be409412-c27e-4319-bcc5-...
+    zone_name: sales
+    domain: .com
+
+    start_services: true
+
+    kongair_services:
+      - name: bookings
+        enabled: true
+        image: ghcr.io/kong/kongair-bookings:latest
+        listen_port: 3000
+        service_port: 3000
+        env:
+          FLIGHT_SVC_ENDPOINT: http://flights.mesh/flights/
+      - name: customer
+        enabled: true
+        image: ghcr.io/kong/kongair-customer:latest
+        listen_port: 3001
+        service_port: 3000
+  roles:
+    - role: mesh-cp
+      tags: cp
+    - role: mesh-dp
+      tags: dp
+    - role: mesh-zone-ingress
+      tags: ingress
+    - role: mesh-demo
+      tags: demo
+    - role: kongair-services
+      tags: services

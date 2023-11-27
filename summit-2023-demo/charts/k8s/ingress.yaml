@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flights
+  namespace: kongair
+  annotations:
+    konghq.com/strip-path: "false"
+spec:
+  ingressClassName: kong
+  rules:
+    - http:
+        paths:
+          - path: /flights
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flights
+                port:
+                  number: 8080

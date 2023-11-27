@@ -1,0 +1,40 @@
+---
+- name: Create user
+  user:
+    name: "{{ kuma_user }}"
+    state: present
+    uid: "{{ kuma_user_id }}"
+    groups:
+      - sudo
+
+- name: Create /etc/kong-mesh
+  ansible.builtin.file:
+    path: /etc/kong-mesh
+    state: directory
+    mode: "0755"
+
+- name: Install Kong Mesh
+  ansible.builtin.shell: |
+    curl -L https://docs.konghq.com/mesh/installer.sh | VERSION={{ mesh_version }} sh -
+  args:
+    creates: "/usr/local/bin/kuma-cp"
+  register: install_mesh
+
+- name: Move Mesh binaries to /usr/local/bin
+  copy:
+    remote_src: yes
+    src: "kong-mesh-{{ mesh_version }}/bin/{{ item }}"
+    dest: /usr/local/bin/{{ item }}
+    mode: "0755"
+  when: install_mesh.changed
+  loop:
+    - coredns
+    - envoy
+    - kuma-cp
+    - kuma-dp
+    - kumactl
+
+- name: Remove mesh installation files
+  ansible.builtin.file:
+    path: kong-mesh-{{ mesh_version }}
+    state: absent

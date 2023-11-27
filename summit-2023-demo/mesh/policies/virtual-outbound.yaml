@@ -1,0 +1,14 @@
+type: VirtualOutbound
+mesh: default
+name: flights
+selectors:
+  - match:
+      kuma.io/service: "*"
+conf:
+  host: "{{.name}}.mesh"
+  port: "80"
+  parameters:
+    - name: service
+      tagKey: "kuma.io/service"
+    - name: name
+      tagKey: k8s.kuma.io/service-name
