@@ -1,0 +1,145 @@
+type: Mesh
+name: default
+mtls:
+  enabledBackend: ca-1
+  backends:
+    - name: ca-1
+      type: builtin
+---
+type: MeshTrafficPermission
+mesh: default
+name: allow-all
+spec:
+  targetRef:
+    kind: Mesh
+  from:
+    - targetRef:
+        kind: Mesh
+      default:
+        action: Allow
+---
+type: MeshGateway
+mesh: default
+name: edge-gateway
+selectors:
+  - match:
+      kuma.io/service: edge-gateway
+conf:
+  listeners:
+    - port: 8080
+      protocol: HTTP
+#---
+#type: MeshGatewayRoute
+#mesh: default
+#name: routes
+#selectors:
+#  - match:
+#      kuma.io/service: edge-gateway
+#conf:
+#  http:
+#      rules:
+#        - matches:
+#            - path:
+#                match: PREFIX
+#                value: /main
+#          filters:
+#            - rewrite:
+#                replacePrefixMatch: /api/dynamic/microservice_mesh
+#          backends:
+#            - destination:
+#                kuma.io/service: api-play-000_microservice-mesh_svc_8080
+#        - matches:
+#            - path:
+#                match: PREFIX
+#                value: /other
+#          filters:
+#            - rewrite:
+#                replacePrefixMatch: /api/dynamic/microservice_mesh
+#          backends:
+#            - destination:
+#                kuma.io/service: api-play-004_microservice-mesh_svc_8080
+---
+type: MeshHTTPRoute
+mesh: default
+name: api-play-000
+spec:
+  targetRef:
+    kind: MeshGateway
+    name: edge-gateway
+  to:
+    - targetRef:
+        kind: Mesh
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /main
+          default:
+            filters:
+              - type: URLRewrite
+                urlRewrite:
+                  path:
+                    type: ReplacePrefixMatch
+                    replacePrefixMatch: /api/dynamic/microservice_mesh
+            backendRefs:
+              - kind: MeshService
+                name: api-play-000_microservice-mesh_svc_8080
+---
+type: MeshHTTPRoute
+mesh: default
+name: api-play-004
+spec:
+  targetRef:
+    kind: MeshGateway
+    name: edge-gateway
+  to:
+    - targetRef:
+        kind: Mesh
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /other
+          default:
+            filters:
+              - type: URLRewrite
+                urlRewrite:
+                  path:
+                    type: ReplacePrefixMatch
+                    replacePrefixMatch: /api/dynamic/microservice_mesh
+            backendRefs:
+              - kind: MeshService
+                name: api-play-004_microservice-mesh_svc_8080
+---
+type: MeshLoadBalancingStrategy
+name: no-failover
+mesh: default
+spec:
+  targetRef:
+    kind: Mesh
+  to:
+    - targetRef:
+        kind: Mesh
+      default:
+        localityAwareness:
+          crossZone:
+            failover:
+              - to:
+                  type: None # Disable locality aware load balancing
+---
+type: MeshCircuitBreaker
+name: outlier-detection
+mesh: default
+spec:
+  targetRef:
+    kind: Mesh
+  to:
+    - targetRef:
+        kind: Mesh
+      default:
+        outlierDetection:
+          baseEjectionTime: 30s
+          maxEjectionPercent: 100
+          detectors:
+            totalFailures:
+              consecutive: 5

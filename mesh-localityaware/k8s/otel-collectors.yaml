@@ -1,0 +1,321 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    component: "server"
+    app: otlp-collector
+  name: otlp-collector
+  namespace: observability
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    component: "server"
+    app: otlp-collector
+  name: otlp-collector
+  namespace: observability
+rules:
+  - apiGroups: [ "" ]
+    resources:
+      - nodes
+      - nodes/proxy
+      - nodes/metrics
+      - services
+      - endpoints
+      - pods
+      - events
+      - secrets
+    verbs: [ "get", "list", "watch" ]
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs: [ "get", "list", "watch" ]
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+      - deployments
+      - replicasets
+      - statefulsets
+    verbs: [ "get", "list", "watch" ]
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs: [ "get", "list", "watch" ]
+  - apiGroups: [ "discovery.k8s.io" ]
+    resources:
+      - endpointslices
+    verbs: [ "get", "list", "watch" ]
+  - nonResourceURLs: [ "/metrics" ]
+    verbs: [ "get" ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    component: "server"
+    app: otlp-collector
+  name: otlp-collector
+  namespace: observability
+subjects:
+  - kind: ServiceAccount
+    name: otlp-collector
+    namespace: observability
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: otlp-collector
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-conf
+  namespace: observability
+  labels:
+    app: opentelemetry
+    component: otel-collector-conf
+data:
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: ${env:MY_POD_IP}:4317
+          http:
+            endpoint: ${env:MY_POD_IP}:4318
+      prometheus:
+        config:
+          scrape_configs:
+          - job_name: 'otelcol'
+            scrape_interval: 10s
+            static_configs:
+            - targets: ['0.0.0.0:8888']
+            metric_relabel_configs:
+              - source_labels: [ __name__ ]
+                regex: '.*grpc_io.*'
+                action: drop
+          - job_name: kubernetes-service-endpoints
+            scrape_interval: 10s
+            kubernetes_sd_configs:
+              - role: endpoints
+            relabel_configs:
+            - action: keep
+              regex: true
+              source_labels:
+              - __meta_kubernetes_service_annotation_prometheus_io_scrape
+            - action: replace
+              regex: (https?)
+              source_labels:
+              - __meta_kubernetes_service_annotation_prometheus_io_scheme
+              target_label: __scheme__
+            - action: replace
+              regex: (.+)
+              source_labels:
+              - __meta_kubernetes_service_annotation_prometheus_io_path
+              target_label: __metrics_path__
+            - action: replace
+              regex: ([^:]+)(?::\d+)?;(\d+)
+              replacement: $$1:$$2
+              source_labels:
+              - __address__
+              - __meta_kubernetes_service_annotation_prometheus_io_port
+              target_label: __address__
+            - action: labelmap
+              regex: __meta_kubernetes_service_label_(.+)
+            - action: replace
+              source_labels:
+              - __meta_kubernetes_namespace
+              target_label: kubernetes_namespace
+            - action: replace
+              source_labels:
+              - __meta_kubernetes_service_name
+              target_label: kubernetes_name
+            - action: replace
+              source_labels:
+              - __meta_kubernetes_pod_node_name
+              target_label: kubernetes_node
+          - job_name: 'kuma-dataplanes'
+            scrape_interval: '10s'
+            relabel_configs:
+              - source_labels:
+                  - __meta_kuma_mesh
+                regex: "(.*)"
+                target_label: mesh
+              - source_labels:
+                  - __meta_kuma_dataplane
+                regex: "(.*)"
+                target_label: dataplane
+              - source_labels:
+                  - __meta_kuma_service
+                regex: "(.*)"
+                target_label: kuma_service
+              - action: labelmap
+                regex: __meta_kuma_label_(.+)
+            kuma_sd_configs:
+              - server: "http://kong-mesh-control-plane.kong-mesh-system.svc:5676" # replace with the url of your control plane
+    processors:
+      filter/metrics:
+        error_mode: ignore
+        metrics:
+          metric:
+            - 'type == METRIC_DATA_TYPE_HISTOGRAM'
+            - 'type == METRIC_DATA_TYPE_SUMMARY' 
+            - 'IsMatch(name, "go_.*")'
+            - 'IsMatch(name, "scrape_.*")'
+            - 'IsMatch(name, "grpc_.*")'
+            - 'IsMatch(name, "envoy_.*") and not (IsMatch(name, "envoy_cluster_upstream_cx_.*") or IsMatch(name, "envoy_cluster_upstream_rq_.*") or IsMatch(name, "envoy_cluster_circuit_breakers_.*") or IsMatch(name, "envoy_http_downstream_.*") or IsMatch(name, "envoy_listener_downstream_.*") or IsMatch(name, "envoy_listener_http_.*"))'
+      batch:
+        send_batch_size: 16384
+        send_batch_max_size: 16384
+        timeout: 10s
+      memory_limiter:
+        # 80% of maximum memory up to 2G
+        limit_mib: 1500
+        # 25% of limit up to 2G
+        spike_limit_mib: 512
+        check_interval: 5s
+    extensions:
+      basicauth/otlp:
+        client_auth:
+          username: ${env:OTEL_GRAFANA_BASICAUTH_USERNAME}
+          password: ${env:OTEL_GRAFANA_BASICAUTH_PASSWORD}
+      basicauth/metrics:
+        client_auth:
+          username: ${env:PROM_GRAFANA_BASICAUTH_USERNAME}
+          password: ${env:OTEL_GRAFANA_BASICAUTH_PASSWORD}
+    exporters:
+      otlphttp/grafana:
+        auth:
+          authenticator: basicauth/otlp
+        endpoint: ${env:OTEL_GRAFANA_ENDPOINT}
+        tls:
+          insecure: true
+      prometheusremotewrite:
+        endpoint: ${env:PROM_GRAFANA_ENDPOINT} 
+        auth:
+          authenticator: basicauth/metrics
+      debug:
+        verbosity: detailed
+    service:
+      extensions: [basicauth/otlp]
+      pipelines:
+        traces/1:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/grafana]
+        logs:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlphttp/grafana]
+        metrics:
+          receivers: [prometheus]
+          processors: [filter/metrics, batch]
+          exporters: [otlphttp/grafana]
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  namespace: observability
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  ports:
+    - name: otlp-grpc # Default endpoint for OpenTelemetry gRPC receiver.
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
+    - name: otlp-http # Default endpoint for OpenTelemetry HTTP receiver.
+      port: 4318
+      protocol: TCP
+      targetPort: 4318
+    - name: metrics # Default endpoint for querying metrics.
+      port: 8888
+  selector:
+    component: otel-collector
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: observability
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  selector:
+    matchLabels:
+      app: opentelemetry
+      component: otel-collector
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  replicas: 1 #TODO - adjust this to your own requirements
+  template:
+    metadata:
+      labels:
+        app: opentelemetry
+        component: otel-collector
+    spec:
+      serviceAccountName: otlp-collector
+      containers:
+        - args:
+            - "--config=/conf/otel-collector-config.yaml"
+          image: otel/opentelemetry-collector-contrib:0.92.0
+          name: otel-collector
+          resources:
+            limits:
+              cpu: 1
+              memory: 2Gi
+            requests:
+              cpu: 200m
+              memory: 400Mi
+          ports:
+            - containerPort: 55679 # Default endpoint for ZPages.
+            - containerPort: 4317 # Default endpoint for OpenTelemetry receiver.
+            - containerPort: 14250 # Default endpoint for Jaeger gRPC receiver.
+            - containerPort: 14268 # Default endpoint for Jaeger HTTP receiver.
+            - containerPort: 9411 # Default endpoint for Zipkin receiver.
+            - containerPort: 8888  # Default endpoint for querying metrics.
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: OTEL_GRAFANA_ENDPOINT
+              value: https://otlp-gateway-prod-us-east-0.grafana.net:443/otlp
+            - name: PROM_GRAFANA_ENDPOINT
+              value: https://prometheus-prod-13-prod-us-east-0.grafana.net/api/prom/push
+            - name: PROM_GRAFANA_BASICAUTH_USERNAME
+              value: "1160390"
+            - name: OTEL_GRAFANA_BASICAUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: otel-providers
+                  key: grafana-user
+            - name: OTEL_GRAFANA_BASICAUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: otel-providers
+                  key: grafana-key
+          volumeMounts:
+            - name: otel-collector-config-vol
+              mountPath: /conf
+              readOnly: true
+      volumes:
+        - configMap:
+            name: otel-collector-conf
+            items:
+              - key: config
+                path: otel-collector-config.yaml
+          name: otel-collector-config-vol
