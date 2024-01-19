@@ -28,36 +28,6 @@ conf:
   listeners:
     - port: 8080
       protocol: HTTP
-#---
-#type: MeshGatewayRoute
-#mesh: default
-#name: routes
-#selectors:
-#  - match:
-#      kuma.io/service: edge-gateway
-#conf:
-#  http:
-#      rules:
-#        - matches:
-#            - path:
-#                match: PREFIX
-#                value: /main
-#          filters:
-#            - rewrite:
-#                replacePrefixMatch: /api/dynamic/microservice_mesh
-#          backends:
-#            - destination:
-#                kuma.io/service: api-play-000_microservice-mesh_svc_8080
-#        - matches:
-#            - path:
-#                match: PREFIX
-#                value: /other
-#          filters:
-#            - rewrite:
-#                replacePrefixMatch: /api/dynamic/microservice_mesh
-#          backends:
-#            - destination:
-#                kuma.io/service: api-play-004_microservice-mesh_svc_8080
 ---
 type: MeshHTTPRoute
 mesh: default
@@ -126,6 +96,24 @@ spec:
             failover:
               - to:
                   type: None # Disable locality aware load balancing
+---
+type: MeshLoadBalancingStrategy
+name: allow-api-play-004
+mesh: default
+spec:
+  targetRef:
+    kind: Mesh
+  to:
+    - targetRef:
+        kind: MeshService
+        name: api-play-004_microservice-mesh_svc_8080
+      default:
+        localityAwareness:
+          crossZone:
+            failover:
+              - to:
+                  type: Any # Disable locality aware load balancing
+
 ---
 type: MeshCircuitBreaker
 name: outlier-detection
