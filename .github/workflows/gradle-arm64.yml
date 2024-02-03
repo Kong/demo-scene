@@ -8,6 +8,8 @@ on:
 
 jobs:
   native-quotes-service:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     defaults:
       run:
         working-directory: kong-builders/11-10-2021/native-quote-service
