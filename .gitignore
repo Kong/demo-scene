@@ -176,3 +176,5 @@ kong-quickstart.env
 kong.env
 *.crt
 *.key
+
+.secrets/

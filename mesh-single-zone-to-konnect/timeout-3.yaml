@@ -1,0 +1,18 @@
+apiVersion: kuma.io/v1alpha1
+kind: MeshTimeout
+metadata:
+  name: timeout-3
+  namespace: kong-mesh-system
+  labels:
+    kuma.io/origin: zone
+spec:
+  targetRef:
+    kind: MeshService
+    name: api-play-000_microservice-mesh_svc_8080
+  to:
+    - targetRef:
+        kind: MeshService
+        name: api-play-003_microservice-mesh_svc_8080
+      default:
+        http:
+          requestTimeout: 2s
