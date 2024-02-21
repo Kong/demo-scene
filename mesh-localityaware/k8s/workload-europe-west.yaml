@@ -1,0 +1,402 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: microservice-mesh
+  labels:
+    kuma.io/sidecar-injection: enabled
+spec: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api-play-000
+  name: api-play-000
+  namespace: microservice-mesh
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-play-000
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: api-play-000
+      name: api-play-000
+      namespace: microservice-mesh
+    spec:
+      containers:
+        - args:
+            - -config-file
+            - /etc/config/config.yaml
+          image: ghcr.io/lahabana/api-play:main
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+          name: app
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 3
+          resources:
+            limits:
+              memory: 32Mi
+            requests:
+              cpu: 100m
+              memory: 32Mi
+          volumeMounts:
+            - mountPath: /etc/config
+              name: config
+      volumes:
+        - configMap:
+            name: api-play-000
+          name: config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: api-play-000
+  name: api-play-000
+  namespace: microservice-mesh
+spec:
+  ports:
+    - appProtocol: http
+      name: api
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: api-play-000
+---
+apiVersion: v1
+data:
+  config.yaml: |-
+    {
+      "apis": [
+        {
+          "conf": {
+            "body": "I am Service 0 and I have 2 replicas in europe-west",
+            "call": [
+              {
+                "url": "http://api-play-001.microservice-mesh.svc.8080.mesh:80/api/dynamic/microservice_mesh"
+              },
+              {
+                "url": "http://api-play-002.microservice-mesh.svc.8080.mesh:80/api/dynamic/microservice_mesh"
+              }
+            ]
+          },
+          "path": "microservice_mesh"
+        }
+      ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: api-play-000
+  name: api-play-000
+  namespace: microservice-mesh
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api-play-001
+  name: api-play-001
+  namespace: microservice-mesh
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-play-001
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: api-play-001
+      name: api-play-001
+      namespace: microservice-mesh
+    spec:
+      containers:
+        - args:
+            - -config-file
+            - /etc/config/config.yaml
+          image: ghcr.io/lahabana/api-play:main
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+          name: app
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 3
+          resources:
+            limits:
+              memory: 32Mi
+            requests:
+              cpu: 100m
+              memory: 32Mi
+          volumeMounts:
+            - mountPath: /etc/config
+              name: config
+      volumes:
+        - configMap:
+            name: api-play-001
+          name: config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: api-play-001
+  name: api-play-001
+  namespace: microservice-mesh
+spec:
+  ports:
+    - appProtocol: http
+      name: api
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: api-play-001
+---
+apiVersion: v1
+data:
+  config.yaml: |-
+    {
+      "apis": [
+        {
+          "conf": {
+            "body": "I am Service 1 and I have 2 replicas in europe-west",
+            "call": []
+          },
+          "path": "microservice_mesh"
+        }
+      ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: api-play-001
+  name: api-play-001
+  namespace: microservice-mesh
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api-play-002
+  name: api-play-002
+  namespace: microservice-mesh
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-play-002
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: api-play-002
+      name: api-play-002
+      namespace: microservice-mesh
+    spec:
+      containers:
+        - args:
+            - -config-file
+            - /etc/config/config.yaml
+          image: ghcr.io/lahabana/api-play:main
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+          name: app
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 3
+          resources:
+            limits:
+              memory: 32Mi
+            requests:
+              cpu: 100m
+              memory: 32Mi
+          volumeMounts:
+            - mountPath: /etc/config
+              name: config
+      volumes:
+        - configMap:
+            name: api-play-002
+          name: config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: api-play-002
+  name: api-play-002
+  namespace: microservice-mesh
+spec:
+  ports:
+    - appProtocol: http
+      name: api
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: api-play-002
+---
+apiVersion: v1
+data:
+  config.yaml: |-
+    {
+      "apis": [
+        {
+          "conf": {
+            "body": "I am Service 2 and I have 2 replicas europe-west",
+            "call": [
+              {
+                "url": "http://api-play-003.microservice-mesh.svc.8080.mesh:80/api/dynamic/microservice_mesh"
+              }
+            ]
+          },
+          "path": "microservice_mesh"
+        }
+      ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: api-play-002
+  name: api-play-002
+  namespace: microservice-mesh
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api-play-003
+  name: api-play-003
+  namespace: microservice-mesh
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-play-003
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: api-play-003
+      name: api-play-003
+      namespace: microservice-mesh
+    spec:
+      containers:
+        - args:
+            - -config-file
+            - /etc/config/config.yaml
+          image: ghcr.io/lahabana/api-play:main
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+          name: app
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 3
+          resources:
+            limits:
+              memory: 32Mi
+            requests:
+              cpu: 100m
+              memory: 32Mi
+          volumeMounts:
+            - mountPath: /etc/config
+              name: config
+      volumes:
+        - configMap:
+            name: api-play-003
+          name: config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: api-play-003
+  name: api-play-003
+  namespace: microservice-mesh
+spec:
+  ports:
+    - appProtocol: http
+      name: api
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: api-play-003
+---
+apiVersion: v1
+data:
+  config.yaml: |-
+    {
+      "apis": [
+        {
+          "conf": {
+            "body": "I am Service 3 and I have 2 replicas in europe-west",
+            "call": []
+          },
+          "path": "microservice_mesh"
+        }
+      ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: api-play-003
+  name: api-play-003
+  namespace: microservice-mesh
+---
+apiVersion: kuma.io/v1alpha1
+kind: MeshGatewayInstance
+metadata:
+  name: edge-gateway
+  namespace: microservice-mesh
+spec:
+  replicas: 2
+  serviceType: LoadBalancer
+  tags:
+    kuma.io/service: edge-gateway

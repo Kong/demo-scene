@@ -1,0 +1,26 @@
+type: MeshLoadBalancingStrategy
+name: failover-gw
+mesh: default
+spec:
+  targetRef:
+    kind: MeshGateway
+    name: edge-gateway
+  to:
+    - targetRef:
+        kind: Mesh
+      default:
+        localityAwareness:
+          crossZone:
+            failoverThreshold:
+              percentage: 99
+            failover:
+              - from:
+                  zones: [us-east, us-west]
+                to:
+                  type: Only
+                  zones: [us-east, us-west]
+              - from:
+                  zones: [europe-west]
+                to:
+                  type: Only
+                  zones: [europe-west, us-east]
