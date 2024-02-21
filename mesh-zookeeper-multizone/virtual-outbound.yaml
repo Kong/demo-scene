@@ -1,0 +1,25 @@
+apiVersion: kuma.io/v1alpha1
+kind: VirtualOutbound
+mesh: default
+metadata:
+  name: zk-instances
+spec:
+  selectors:
+    - match:
+        k8s.kuma.io/namespace: zookeeper
+        app-type: zk
+        kuma.io/service: "*"
+        statefulset.kubernetes.io/pod-name: "*"
+        pod-index: "*"
+  conf:
+    host: "{{.index}}.{{.app}}.zookeeper.mesh"
+    port: "{{.port}}"
+    parameters:
+      - name: "app"
+        tagKey: "app-type"
+      - name: svc
+        tagKey: "kuma.io/service"
+      - name: index
+        tagKey: "pod-index"
+      - name: port
+        tagKey: "k8s.kuma.io/service-port"
