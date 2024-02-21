@@ -1,0 +1,5 @@
+= KIC for Prometheus and Grafana
+
+Scripts and Kubernetes resource definitions for https://docs.konghq.com/kubernetes-ingress-controller/1.3.x/guides/prometheus-grafana/[guide]
+
+_more tbd..._

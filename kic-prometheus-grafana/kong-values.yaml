@@ -1,0 +1,3 @@
+podAnnotations:
+  prometheus.io/scrape: "true" # Ask Prometheus to scrape the
+  prometheus.io/port: "8100"
