@@ -1,0 +1,6 @@
+kuma:
+  controlPlane:
+    secrets:
+      - Env: "KMESH_LICENSE_INLINE"
+        Secret: "kong-mesh-license"
+        Key: "license.json"
