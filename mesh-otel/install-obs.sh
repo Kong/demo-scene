@@ -1,4 +1,5 @@
 #!/bin/bash
+kubectl create namespace observability
 
 kubectl delete secret -n observability otel-providers
 kubectl create secret generic -n observability otel-providers \
@@ -10,5 +11,3 @@ kubectl create secret generic -n observability otel-providers \
 kubectl apply -f otel-collectors.yaml
 
 kubectl rollout restart -n observability deployment/otel-collector
-
-
