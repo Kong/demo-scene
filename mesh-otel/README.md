@@ -20,10 +20,16 @@ Install everything on your k8s cluster with:
 ./install-obs.sh
 ```
 
-Apply the policies in Kuma:
+Apply the policies in Kuma (universal):
 
 ```shell
-kumactl apply -f telemetry.yaml
+kumactl apply -f telemetry-universal.yaml
+```
+
+Apply the policies in Kuma (k8s):
+
+```shell
+kumactl apply -f telemetry-k8s.yaml
 ```
 
 Go to any provider and look at traces and metrics.
