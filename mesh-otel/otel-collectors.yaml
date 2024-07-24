@@ -156,7 +156,7 @@ data:
         traces/1:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [otlphttp/grafana, otlp/honeycomb, datadog/connector, otlphttp/dynatrace]
+          exporters: [otlphttp/grafana, otlp/honeycomb, otlphttp/dynatrace, datadog/connector]
         traces/2:
           receivers: [datadog/connector]
           processors: [batch]
