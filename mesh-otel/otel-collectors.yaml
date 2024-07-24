@@ -99,8 +99,9 @@ data:
           metric:
             - 'type == METRIC_DATA_TYPE_HISTOGRAM'
       batch:
-        send_batch_size: 4096
-        send_batch_max_size: 8192
+        send_batch_max_size: 1000
+        send_batch_size: 100
+        timeout: 10s
       memory_limiter:
         # 80% of maximum memory up to 2G
         limit_mib: 1500
@@ -116,6 +117,8 @@ data:
         client_auth:
           username: ${env:OTEL_GRAFANA_BASICAUTH_USERNAME}
           password: ${env:OTEL_GRAFANA_BASICAUTH_PASSWORD}
+    connectors:
+      datadog/connector:
     exporters:
       otlphttp/grafana:
         auth:
@@ -139,16 +142,25 @@ data:
         headers:
           Authorization: "Api-Token ${env:DT_API_TOKEN}"
     service:
+      telemetry:
+        logs:
+          level: INFO
+        metrics:
+          address: 0.0.0.0:8888
       extensions: [zpages, memory_ballast, basicauth/otlp]
       pipelines:
-        traces/1:
-          receivers: [otlp]
-          processors: [memory_limiter, batch]
-          exporters: [otlphttp/grafana, otlp/honeycomb, datadog, otlphttp/dynatrace]
         metrics:
           receivers: [otlp]
           processors: [batch]
           exporters: [otlphttp/grafana, otlp/honeycomb, datadog]
+        traces/1:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/grafana, otlp/honeycomb, datadog/connector, otlphttp/dynatrace]
+        traces/2:
+          receivers: [datadog/connector]
+          processors: [batch]
+          exporters: [datadog]
         metrics/dynatrace:
           receivers: [otlp]
           processors: [filter/histograms, batch, cumulativetodelta]
