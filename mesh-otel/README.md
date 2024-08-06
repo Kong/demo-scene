@@ -7,6 +7,7 @@ In our example we show how to use:
 - [Grafana Cloud](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/otlp/send-data-otlp/)
 - [Datadog](https://www.datadoghq.com/blog/ingest-opentelemetry-traces-metrics-with-datadog-exporter/)
 - [HoneyComb](https://docs.honeycomb.io/getting-data-in/otel-collector/)
+- [Dynatrace](https://docs.dynatrace.com/docs/extend-dynatrace/opentelemetry)
 
 ## Run it yourself
 
