@@ -270,7 +270,7 @@ spec:
                   name: otel-providers
                   key: honeycomb-api-key
             - name: DT_OTLP_ENDPOINT
-              value: https://vsr29397.live.dynatrace.com/api/v2/otlp
+              value: https://exs78954.live.dynatrace.com/api/v2/otlp
             - name: DT_API_TOKEN
               valueFrom:
                 secretKeyRef:

@@ -29,7 +29,7 @@ kumactl apply -f telemetry-universal.yaml
 Apply the policies in Kuma (k8s):
 
 ```shell
-kumactl apply -f telemetry-k8s.yaml
+kubectl apply -f telemetry-k8s.yaml
 ```
 
 Go to any provider and look at traces and metrics.

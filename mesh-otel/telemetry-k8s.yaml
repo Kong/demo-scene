@@ -3,7 +3,7 @@ apiVersion: kuma.io/v1alpha1
 kind: MeshMetric
 metadata:
   name: default
-  namespace: kuma-system
+  namespace: kong-mesh-system
   labels:
     kuma.io/mesh: default
 spec:
@@ -20,7 +20,7 @@ apiVersion: kuma.io/v1alpha1
 kind: MeshTrace
 metadata:
   name: default
-  namespace: kuma-system
+  namespace: kong-mesh-system
   labels:
     kuma.io/mesh: default
 spec:
@@ -36,7 +36,7 @@ apiVersion: kuma.io/v1alpha1
 kind: MeshAccessLog
 metadata:
   name: default
-  namespace: kuma-system
+  namespace: kong-mesh-system
   labels:
     kuma.io/mesh: default # optional, defaults to `default` if it isn't configured
 spec:
