@@ -91,84 +91,17 @@ data:
             endpoint: ${env:MY_POD_IP}:4317
           http:
             endpoint: ${env:MY_POD_IP}:4318
-      prometheus:
-        config:
-          scrape_configs:
-          - job_name: 'otelcol'
-            scrape_interval: 30s
-            static_configs:
-            - targets: ['0.0.0.0:8888']
-            metric_relabel_configs:
-              - source_labels: [ __name__ ]
-                regex: '.*grpc_io.*'
-                action: drop
-          - job_name: kubernetes-service-endpoints
-            scrape_interval: 10s
-            kubernetes_sd_configs:
-              - role: endpoints
-            relabel_configs:
-            - action: keep
-              regex: true
-              source_labels:
-              - __meta_kubernetes_service_annotation_prometheus_io_scrape
-            - action: replace
-              regex: (https?)
-              source_labels:
-              - __meta_kubernetes_service_annotation_prometheus_io_scheme
-              target_label: __scheme__
-            - action: replace
-              regex: (.+)
-              source_labels:
-              - __meta_kubernetes_service_annotation_prometheus_io_path
-              target_label: __metrics_path__
-            - action: replace
-              regex: ([^:]+)(?::\d+)?;(\d+)
-              replacement: $$1:$$2
-              source_labels:
-              - __address__
-              - __meta_kubernetes_service_annotation_prometheus_io_port
-              target_label: __address__
-            - action: labelmap
-              regex: __meta_kubernetes_service_label_(.+)
-            - action: replace
-              source_labels:
-              - __meta_kubernetes_namespace
-              target_label: kubernetes_namespace
-            - action: replace
-              source_labels:
-              - __meta_kubernetes_service_name
-              target_label: kubernetes_name
-            - action: replace
-              source_labels:
-              - __meta_kubernetes_pod_node_name
-              target_label: kubernetes_node
-          - job_name: 'kuma-dataplanes'
-            scrape_interval: '10s'
-            relabel_configs:
-              - source_labels:
-                  - __meta_kuma_mesh
-                regex: "(.*)"
-                target_label: mesh
-              - source_labels:
-                  - __meta_kuma_dataplane
-                regex: "(.*)"
-                target_label: dataplane
-              - source_labels:
-                  - __meta_kuma_service
-                regex: "(.*)"
-                target_label: service
-              - action: labelmap
-                regex: __meta_kuma_label_(.+)
-              - action: labelmap
-                regex: __(address)__
-              - action: labelmap
-                regex: __(meta_kubernetes.*)__
-            kuma_sd_configs:
-              - server: "http://kong-mesh-control-plane.kong-mesh-system.svc:5676" # replace with the url of your control plane
     processors:
+      cumulativetodelta:
+      filter/histograms:
+        error_mode: ignore
+        metrics:
+          metric:
+            - 'type == METRIC_DATA_TYPE_HISTOGRAM'
       batch:
-        send_batch_size: 4096
-        send_batch_max_size: 8192
+        send_batch_max_size: 1000
+        send_batch_size: 100
+        timeout: 10s
       memory_limiter:
         # 80% of maximum memory up to 2G
         limit_mib: 1500
@@ -184,6 +117,8 @@ data:
         client_auth:
           username: ${env:OTEL_GRAFANA_BASICAUTH_USERNAME}
           password: ${env:OTEL_GRAFANA_BASICAUTH_PASSWORD}
+    connectors:
+      datadog/connector:
     exporters:
       otlphttp/grafana:
         auth:
@@ -202,21 +137,38 @@ data:
         headers:
           "x-honeycomb-team": ${env:OTEL_HONEYCOMB_API_KEY}
           "x-honeycomb-dataset": ${env:OTEL_HONEYCOMB_DATASET}
+      otlphttp/dynatrace:
+        endpoint: "${env:DT_OTLP_ENDPOINT}"
+        headers:
+          Authorization: "Api-Token ${env:DT_API_TOKEN}"
     service:
+      telemetry:
+        logs:
+          level: INFO
+        metrics:
+          address: 0.0.0.0:8888
       extensions: [zpages, memory_ballast, basicauth/otlp]
       pipelines:
+        metrics:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlphttp/grafana, otlp/honeycomb, datadog]
         traces/1:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [otlphttp/grafana, otlp/honeycomb, datadog]
-        metrics:
-          receivers: [prometheus]
+          exporters: [otlphttp/grafana, otlp/honeycomb, otlphttp/dynatrace, datadog/connector]
+        traces/2:
+          receivers: [datadog/connector]
           processors: [batch]
-          exporters: [otlphttp/grafana, otlp/honeycomb, datadog]
+          exporters: [datadog]
+        metrics/dynatrace:
+          receivers: [otlp]
+          processors: [filter/histograms, batch, cumulativetodelta]
+          exporters: [otlphttp/dynatrace]
         logs:
           receivers: [otlp]
           processors: [batch]
-          exporters: [otlphttp/grafana,  otlp/honeycomb, datadog]
+          exporters: [otlphttp/grafana,  otlp/honeycomb, datadog, otlphttp/dynatrace]
 ---
 apiVersion: v1
 kind: Service
@@ -267,7 +219,7 @@ spec:
       containers:
         - args:
             - "--config=/conf/otel-collector-config.yaml"
-          image: otel/opentelemetry-collector-contrib:0.83.0
+          image: otel/opentelemetry-collector-contrib:0.105.0
           name: otel-collector
           resources:
             limits:
@@ -290,7 +242,7 @@ spec:
                   apiVersion: v1
                   fieldPath: status.podIP
             - name: OTEL_GRAFANA_ENDPOINT
-              value: https://otlp-gateway-prod-us-east-0.grafana.net:443/otlp
+              value: https://otlp-gateway-prod-eu-west-2.grafana.net/otlp
             - name: OTEL_GRAFANA_BASICAUTH_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -317,6 +269,13 @@ spec:
                 secretKeyRef:
                   name: otel-providers
                   key: honeycomb-api-key
+            - name: DT_OTLP_ENDPOINT
+              value: https://exs78954.live.dynatrace.com/api/v2/otlp
+            - name: DT_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: otel-providers
+                  key: dynatrace-token
           volumeMounts:
             - name: otel-collector-config-vol
               mountPath: /conf

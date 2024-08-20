@@ -41,4 +41,5 @@ spec:
           - type: OpenTelemetry
             openTelemetry:
               endpoint: otel-collector.observability.svc:4317
+---
 

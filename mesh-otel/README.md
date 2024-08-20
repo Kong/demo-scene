@@ -7,6 +7,7 @@ In our example we show how to use:
 - [Grafana Cloud](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/otlp/send-data-otlp/)
 - [Datadog](https://www.datadoghq.com/blog/ingest-opentelemetry-traces-metrics-with-datadog-exporter/)
 - [HoneyComb](https://docs.honeycomb.io/getting-data-in/otel-collector/)
+- [Dynatrace](https://docs.dynatrace.com/docs/extend-dynatrace/opentelemetry)
 
 ## Run it yourself
 
@@ -20,10 +21,16 @@ Install everything on your k8s cluster with:
 ./install-obs.sh
 ```
 
-Apply the policies in Kuma:
+Apply the policies in Kuma (universal):
 
 ```shell
-kumactl apply -f telemetry.yaml
+kumactl apply -f telemetry-universal.yaml
+```
+
+Apply the policies in Kuma (k8s):
+
+```shell
+kubectl apply -f telemetry-k8s.yaml
 ```
 
 Go to any provider and look at traces and metrics.
