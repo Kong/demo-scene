@@ -1,0 +1,187 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: zookeeper
+  labels:
+    kuma.io/sidecar-injection: enabled
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-hs
+  namespace: zookeeper
+  labels:
+    app: zk
+spec:
+  ports:
+    - port: 2888
+      name: server
+    - port: 3888
+      name: leader-election
+  clusterIP: None
+  selector:
+    app: zk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-cs
+  namespace: zookeeper
+  labels:
+    app: zk
+spec:
+  ports:
+    - port: 2181
+      name: client
+  selector:
+    app: zk
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: zk-pdb
+  namespace: zookeeper
+spec:
+  selector:
+    matchLabels:
+      app: zk
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zk
+  namespace: zookeeper
+spec:
+  selector:
+    matchLabels:
+      app: zk
+  serviceName: zk-hs
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      annotations:
+        kuma.io/envoy-component-log-level: config:debug,connection:debug
+      labels:
+        app: zk
+        app-type: zk
+        pod-index: "1"
+    spec:
+      initContainers:
+        - command:
+            - /bin/bash
+            - -c
+            - |-
+              id=$(( ${ZOO_MY_ID} ))
+              echo "Zookeeper MyId: ${id}"
+              echo ${id} > /data/myid
+              cp /zk-config/zoo.cfg /conf/zoo.cfg
+
+              for i in {1..3}; do
+                addr=${i}.zk.zookeeper.mesh
+                if [[ "${i}" == "${id}" ]]; then
+                  addr="0.0.0.0"
+                fi
+                echo "server.${i}=${addr}:2888:3888;2181" >> /conf/zoo.cfg
+              done
+              cat /conf/zoo.cfg
+          env:
+            - name: ZOO_MY_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['pod-index']
+          image: zookeeper:3.6.2
+          name: zookeeper-init
+          securityContext:
+            runAsUser: 1000
+          volumeMounts:
+            - name: datadir
+              mountPath: /data
+            - name: zk-config
+              mountPath: /zk-config
+            - name: conf
+              mountPath: /conf
+      containers:
+        - name: kubernetes-zookeeper
+          imagePullPolicy: Always
+          image: "zookeeper:3.9.0"
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "0.5"
+          ports:
+            - containerPort: 2181
+              name: client
+            - containerPort: 2888
+              name: server
+            - containerPort: 3888
+              name: leader-election
+          readinessProbe:
+            exec:
+              command:
+                [
+                  "/bin/sh",
+                  "-c",
+                  'echo "ruok" | nc -w 2 localhost 2181 | grep imok',
+                ]
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                [
+                  "/bin/sh",
+                  "-c",
+                  'echo "ruok" | nc -w 2 localhost 2181 | grep imok',
+                ]
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: datadir
+              mountPath: /data
+            - name: conf
+              mountPath: /conf
+            - name: zk-config
+              mountPath: /zk-config
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      volumes:
+        - name: zk-config
+          configMap:
+            name: zk-config
+        - name: conf
+          emptyDir:
+            sizeLimit: 500Mi
+  volumeClaimTemplates:
+    - metadata:
+        name: datadir
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: zookeeper
+  name: zk-config
+data:
+  zoo.cfg: |
+    dataDir=/data
+    dataLogDir=/datalog
+    tickTime=2000
+    initLimit=5
+    syncLimit=2
+    autopurge.snapRetainCount=3
+    autopurge.purgeInterval=0
+    maxClientCnxns=60
+    standaloneEnabled=true
+    admin.enableServer=true
+    4lw.commands.whitelist=stat, ruok, conf, isro
