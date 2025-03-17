@@ -5,15 +5,18 @@ mtls:
   backends:
     - name: ca-1
       type: builtin
-metrics:
-  enabledBackend: prometheus-1
-  backends:
-    - name: prometheus-1
-      type: prometheus
-      conf:
-        skipMTLS: true
-        envoy:
-          usedOnly: true
+---
+type: MeshMetric
+name: otel
+mesh: default
+spec:
+  targetRef:
+    kind: Mesh
+  default:
+    backends:
+      - type: OpenTelemetry
+        openTelemetry:
+          endpoint: otel-collector.observability.svc:4317
 ---
 type: MeshTrace
 name: otel
